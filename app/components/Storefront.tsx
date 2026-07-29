@@ -72,11 +72,11 @@ export function Storefront({ store }: StorefrontProps) {
           <div className="welcome-copy">
             <span className="eyebrow">WELCOME, 민지님</span>
             <h1>
-              오늘의 신선한
+              오늘의 행운을
               <br />
-              <em>행운을 잡아보세요!</em>
+              <em>잡아보세요!</em>
             </h1>
-            <p>매장을 방문한 고객님을 위한 특별한 혜택이에요.</p>
+            <p>오늘 매장을 방문한 고객님만을 위한 특별한 혜택이에요.</p>
           </div>
 
           <button className="game-card" onClick={playGame}>

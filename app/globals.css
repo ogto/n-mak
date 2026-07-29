@@ -47,13 +47,13 @@ button {
   min-height: 100vh;
   background: var(--cream);
   overflow: hidden;
-  padding-bottom: calc(82px + env(safe-area-inset-bottom));
+  padding-bottom: calc(112px + env(safe-area-inset-bottom));
 }
 
 .hero {
   position: relative;
-  min-height: 420px;
-  padding: max(20px, env(safe-area-inset-top)) 20px 60px;
+  min-height: 0;
+  padding: max(22px, env(safe-area-inset-top)) 22px 76px;
   overflow: hidden;
   color: white;
   background:
@@ -102,15 +102,17 @@ button {
 .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .brand-logo-box {
-  width: 154px;
-  height: 52px;
+  width: 172px;
+  height: 62px;
   display: flex;
   align-items: center;
-  padding: 7px 12px;
+  justify-content: center;
+  padding: 0;
+  overflow: hidden;
   border: 1px solid rgba(255,255,255,.18);
   border-radius: 14px;
   background: rgba(255,255,255,.96);
@@ -118,9 +120,11 @@ button {
 }
 
 .brand-logo {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  width: 125%;
+  max-width: none;
+  height: auto;
+  flex: 0 0 auto;
+  transform: translateY(-1px);
 }
 
 .brand-wordmark {
@@ -138,16 +142,16 @@ button {
 }
 
 .branch-copy strong {
-  font-size: 12px;
+  font-size: 14px;
   letter-spacing: -.04em;
 }
 
 .branch-copy span {
-  max-width: 115px;
-  margin-top: 2px;
+  max-width: 120px;
+  margin-top: 4px;
   overflow: hidden;
   color: rgba(255,255,255,.62);
-  font-size: 8px;
+  font-size: 10px;
   letter-spacing: -.02em;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -155,8 +159,8 @@ button {
 
 .icon-button {
   position: relative;
-  width: 42px;
-  height: 42px;
+  width: 50px;
+  height: 50px;
   border: 1px solid rgba(255,255,255,.15);
   border-radius: 50%;
   background: rgba(255,255,255,.08);
@@ -166,8 +170,8 @@ button {
   position: absolute;
   width: 7px;
   height: 7px;
-  top: 9px;
-  right: 10px;
+  top: 10px;
+  right: 11px;
   border: 2px solid var(--navy);
   border-radius: 50%;
   background: var(--coral);
@@ -175,10 +179,10 @@ button {
 
 .bell {
   position: absolute;
-  width: 14px;
-  height: 16px;
-  top: 11px;
-  left: 13px;
+  width: 16px;
+  height: 19px;
+  top: 13px;
+  left: 15px;
   border: 2px solid white;
   border-radius: 8px 8px 5px 5px;
 }
@@ -198,24 +202,24 @@ button {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 1fr 146px;
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
-  gap: 18px;
-  margin-top: 42px;
+  gap: 24px;
+  margin-top: 48px;
 }
 
 .eyebrow {
   display: block;
   color: var(--aqua);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: .14em;
 }
 
 .welcome h1 {
-  margin: 9px 0 8px;
-  font-size: clamp(30px, 8.3vw, 43px);
-  line-height: 1.1;
+  margin: 12px 0 12px;
+  font-size: clamp(42px, 12vw, 54px);
+  line-height: 1.04;
   letter-spacing: -.065em;
 }
 
@@ -227,13 +231,15 @@ button {
 .welcome-copy p {
   margin: 0;
   color: rgba(255,255,255,.62);
-  font-size: 12px;
+  font-size: 14px;
+  line-height: 1.55;
 }
 
 .game-card {
   position: relative;
-  height: 202px;
-  padding: 18px;
+  width: 100%;
+  height: 210px;
+  padding: 26px;
   overflow: hidden;
   color: var(--navy);
   text-align: left;
@@ -250,7 +256,7 @@ button {
 .game-label {
   position: relative;
   z-index: 3;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 800;
   letter-spacing: .04em;
 }
@@ -259,8 +265,8 @@ button {
   position: relative;
   z-index: 3;
   display: block;
-  margin-top: 7px;
-  font-size: 23px;
+  margin-top: 9px;
+  font-size: 36px;
   font-weight: 900;
   line-height: 1.06;
   letter-spacing: -.08em;
@@ -273,18 +279,18 @@ button {
 .game-cta {
   position: absolute;
   z-index: 4;
-  bottom: 16px;
-  left: 18px;
+  bottom: 24px;
+  left: 26px;
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 800;
 }
 
 .game-cta b {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   display: grid;
   place-content: center;
   color: white;
@@ -294,31 +300,31 @@ button {
 
 .sun {
   position: absolute;
-  width: 45px;
-  height: 45px;
-  top: 15px;
-  right: 10px;
+  width: 64px;
+  height: 64px;
+  top: 20px;
+  right: 22px;
   border-radius: 50%;
   background: rgba(255,255,255,.6);
 }
 
 .wave {
   position: absolute;
-  width: 210px;
-  height: 120px;
+  width: 310px;
+  height: 150px;
   border-radius: 50%;
 }
 
 .wave-one {
-  right: -80px;
-  bottom: -40px;
+  right: -75px;
+  bottom: -58px;
   background: var(--blue);
   transform: rotate(-13deg);
 }
 
 .wave-two {
-  right: -32px;
-  bottom: -78px;
+  right: -25px;
+  bottom: -100px;
   background: var(--navy);
   transform: rotate(16deg);
 }
@@ -326,10 +332,10 @@ button {
 .fish {
   position: absolute;
   z-index: 3;
-  right: 40px;
-  bottom: 42px;
-  width: 32px;
-  height: 18px;
+  right: 72px;
+  bottom: 52px;
+  width: 46px;
+  height: 25px;
   color: var(--coral);
   font-size: 18px;
   line-height: 15px;
@@ -341,27 +347,27 @@ button {
 .fish::after {
   content: "";
   position: absolute;
-  right: -11px;
-  top: 2px;
-  border-top: 7px solid transparent;
-  border-bottom: 7px solid transparent;
-  border-left: 12px solid var(--coral);
+  right: -15px;
+  top: 3px;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 16px solid var(--coral);
 }
 
 .content {
   position: relative;
   z-index: 3;
-  padding: 0 18px 40px;
-  margin-top: -34px;
+  padding: 0 20px 48px;
+  margin-top: -42px;
 }
 
 .member-card {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 12px 20px;
-  padding: 20px;
+  gap: 16px 22px;
+  padding: 25px 24px;
   border: 1px solid rgba(19, 49, 64, .06);
-  border-radius: 22px;
+  border-radius: 26px;
   background: rgba(255,255,255,.96);
   box-shadow: 0 13px 40px rgba(13, 53, 68, .1);
 }
@@ -373,14 +379,14 @@ button {
 
 .member-tier {
   color: var(--blue);
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 900;
   letter-spacing: .12em;
 }
 
 .member-card strong {
   margin-top: 5px;
-  font-size: 14px;
+  font-size: 17px;
   letter-spacing: -.04em;
 }
 
@@ -392,21 +398,21 @@ button {
 
 .points span {
   color: var(--muted);
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .points b {
   margin-top: 1px;
-  font-size: 21px;
+  font-size: 27px;
 }
 
 .points small {
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .progress {
   grid-column: 1 / -1;
-  height: 5px;
+  height: 7px;
   overflow: hidden;
   border-radius: 10px;
   background: #e6eeee;
@@ -423,14 +429,14 @@ button {
   grid-column: 1 / -1;
   margin: -5px 0 0;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .quick-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  margin: 25px 0 34px;
+  gap: 10px;
+  margin: 34px 0 46px;
 }
 
 .quick-item {
@@ -442,13 +448,13 @@ button {
 }
 
 .quick-icon {
-  width: 50px;
-  height: 50px;
+  width: 66px;
+  height: 66px;
   display: grid;
   place-content: center;
-  margin-bottom: 8px;
-  border-radius: 17px;
-  font-size: 18px;
+  margin-bottom: 11px;
+  border-radius: 22px;
+  font-size: 24px;
   font-weight: 900;
 }
 
@@ -458,62 +464,62 @@ button {
 .quick-icon.sand { background: #eee7d9; color: #846f47; }
 
 .quick-item strong {
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: -.04em;
 }
 
 .quick-item small {
-  margin-top: 3px;
+  margin-top: 5px;
   color: #8a989e;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .tablet-grid {
   display: grid;
-  gap: 26px;
+  gap: 30px;
 }
 
 .section-heading {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .section-heading span {
   color: var(--coral);
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 900;
   letter-spacing: .13em;
 }
 
 .section-heading h2 {
   margin: 4px 0 0;
-  font-size: 20px;
+  font-size: 27px;
   letter-spacing: -.06em;
 }
 
 .section-heading button {
-  padding: 6px 0;
+  padding: 10px 0;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 12px;
   background: transparent;
 }
 
 .coupon-list {
   display: grid;
-  gap: 10px;
+  gap: 14px;
 }
 
 .coupon {
   position: relative;
   display: grid;
-  grid-template-columns: 76px 1fr 34px;
+  grid-template-columns: 90px 1fr 46px;
   align-items: center;
-  min-height: 104px;
+  min-height: 126px;
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: 22px;
   background: white;
 }
 
@@ -523,7 +529,7 @@ button {
   position: absolute;
   width: 14px;
   height: 14px;
-  left: 69px;
+  left: 83px;
   border: 1px solid var(--line);
   border-radius: 50%;
   background: var(--cream);
@@ -545,8 +551,8 @@ button {
 .coupon-badge.coral { background: var(--coral); }
 
 .coupon-badge b {
-  max-width: 65px;
-  font-size: 18px;
+  max-width: 76px;
+  font-size: 22px;
   line-height: 1;
   letter-spacing: -.08em;
   text-align: center;
@@ -554,52 +560,52 @@ button {
 
 .coupon-badge span {
   margin-top: 7px;
-  font-size: 7px;
+  font-size: 9px;
   letter-spacing: .14em;
 }
 
 .coupon-copy {
   min-width: 0;
-  padding: 15px 12px;
+  padding: 18px 16px;
 }
 
 .coupon-copy strong {
   display: block;
-  font-size: 13px;
+  font-size: 16px;
   letter-spacing: -.04em;
 }
 
 .coupon-copy p {
-  margin: 5px 0 8px;
+  margin: 7px 0 11px;
   overflow: hidden;
   color: var(--muted);
-  font-size: 9px;
+  font-size: 11px;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
 .coupon-copy span {
   color: #9ba5aa;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .download {
-  width: 28px;
-  height: 28px;
+  width: 38px;
+  height: 38px;
   display: grid;
   place-content: center;
   padding-bottom: 3px;
   border-radius: 50%;
   color: var(--blue);
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 900;
   background: #e6f2f4;
 }
 
 .channel-card {
   position: relative;
-  min-height: 235px;
-  padding: 27px;
+  min-height: 286px;
+  padding: 32px;
   overflow: hidden;
   border-radius: 26px;
   background: var(--kakao);
@@ -641,42 +647,43 @@ button {
 }
 
 .channel-card span {
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 800;
 }
 
 .channel-card h2 {
   margin: 7px 0;
-  font-size: 25px;
+  font-size: 32px;
   line-height: 1.1;
   letter-spacing: -.07em;
 }
 
 .channel-card p {
-  max-width: 210px;
+  max-width: 240px;
   margin: 0;
   color: rgba(29, 25, 19, .65);
-  font-size: 10px;
-  line-height: 1.5;
+  font-size: 13px;
+  line-height: 1.55;
 }
 
 .channel-card button {
   position: absolute;
   z-index: 2;
-  left: 27px;
-  bottom: 24px;
-  padding: 11px 17px;
+  left: 32px;
+  bottom: 30px;
+  min-height: 48px;
+  padding: 13px 20px;
   color: white;
   border-radius: 10px;
   background: #3c2b20;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 800;
 }
 
 .footer-note {
   margin: 30px 0 10px;
   color: #9aa5a7;
-  font-size: 9px;
+  font-size: 11px;
   text-align: center;
 }
 
@@ -728,8 +735,8 @@ button {
   left: 0;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  min-height: 68px;
-  padding: 8px 10px max(8px, env(safe-area-inset-bottom));
+  min-height: 80px;
+  padding: 10px 10px max(10px, env(safe-area-inset-bottom));
   border-top: 1px solid rgba(8, 42, 57, .08);
   background: rgba(255,255,255,.94);
   backdrop-filter: blur(18px);
@@ -741,16 +748,16 @@ button {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 5px;
   color: #8b999e;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   text-decoration: none;
   background: transparent;
 }
 
 .bottom-nav span {
-  font-size: 20px;
+  font-size: 24px;
   line-height: 1;
 }
 
@@ -759,11 +766,11 @@ button {
 }
 
 .nav-game {
-  width: 43px;
-  height: 43px;
+  width: 52px;
+  height: 52px;
   display: grid !important;
   place-content: center;
-  margin-top: -26px;
+  margin-top: -32px;
   color: white;
   border: 5px solid var(--cream);
   border-radius: 50%;
@@ -786,7 +793,7 @@ button {
 .game-modal {
   position: relative;
   width: min(100%, 430px);
-  padding: 35px 25px 24px;
+  padding: 42px 28px 28px;
   border-radius: 30px 30px 22px 22px;
   text-align: center;
   background: #f7f4ec;
@@ -802,31 +809,31 @@ button {
   position: absolute;
   top: 14px;
   right: 16px;
-  width: 34px;
-  height: 34px;
+  width: 42px;
+  height: 42px;
   color: #6b7d84;
   border-radius: 50%;
   background: rgba(13, 61, 81, .07);
-  font-size: 23px;
+  font-size: 27px;
 }
 
 .modal-eyebrow {
   color: var(--coral);
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 900;
   letter-spacing: .14em;
 }
 
 .game-modal h2 {
   margin: 8px 0 16px;
-  font-size: 27px;
+  font-size: 32px;
   line-height: 1.15;
   letter-spacing: -.07em;
 }
 
 .game-modal > p {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .catch-scene {
@@ -861,11 +868,12 @@ button {
 .primary-button {
   width: 100%;
   margin-top: 10px;
-  padding: 15px;
+  min-height: 56px;
+  padding: 16px;
   color: white;
   border-radius: 14px;
   background: var(--navy);
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 800;
 }
 
@@ -904,12 +912,12 @@ button {
   bottom: calc(88px + env(safe-area-inset-bottom));
   width: max-content;
   max-width: calc(100% - 40px);
-  padding: 12px 18px;
+  padding: 15px 21px;
   color: white;
   border-radius: 22px;
   background: rgba(5, 38, 54, .92);
   box-shadow: 0 8px 25px rgba(0,0,0,.2);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   transform: translateX(-50%);
 }
@@ -935,12 +943,12 @@ button {
   }
 
   .brand-logo-box {
-    width: 190px;
-    height: 61px;
+    width: 214px;
+    height: 70px;
   }
 
   .welcome h1 {
-    font-size: 48px;
+    font-size: 52px;
   }
 
   .game-card {
@@ -970,12 +978,12 @@ button {
   }
 
   .quick-icon {
-    width: 62px;
-    height: 62px;
+    width: 72px;
+    height: 72px;
   }
 
   .quick-item strong {
-    font-size: 13px;
+    font-size: 15px;
   }
 
   .tablet-grid {
@@ -991,7 +999,7 @@ button {
     right: 24px;
     bottom: 22px;
     left: auto;
-    width: 440px;
+    width: 480px;
     border: 1px solid rgba(8, 42, 57, .08);
     border-radius: 24px;
     box-shadow: 0 12px 35px rgba(8, 38, 51, .16);
@@ -1003,6 +1011,48 @@ button {
 
   .game-modal {
     border-radius: 30px;
+  }
+}
+
+@media (max-width: 420px) {
+  .hero {
+    padding-inline: 18px;
+  }
+
+  .brand-logo-box {
+    width: 154px;
+    height: 58px;
+  }
+
+  .branch-copy span {
+    display: none;
+  }
+
+  .branch-copy strong {
+    max-width: 55px;
+    font-size: 13px;
+  }
+
+  .icon-button {
+    width: 46px;
+    height: 46px;
+  }
+
+  .welcome h1 {
+    font-size: clamp(39px, 11.5vw, 48px);
+  }
+
+  .quick-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .quick-item strong {
+    font-size: 12px;
+  }
+
+  .quick-item small {
+    font-size: 10px;
   }
 }
 
