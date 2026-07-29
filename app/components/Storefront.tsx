@@ -2,13 +2,14 @@
 
 import type { CSSProperties } from "react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import type { StoreConfig } from "../../lib/stores";
 
 const quickMenus = [
-  { icon: "attendance", label: "출석체크", detail: "오늘 +100P", tone: "mint" },
-  { icon: "ticket", label: "내 쿠폰", detail: "3장 보유", tone: "coral", target: "coupons" },
-  { icon: "points", label: "포인트", detail: "2,450P", tone: "blue" },
-  { icon: "store", label: "매장정보", detail: "영업중", tone: "sand" },
+  { icon: "attendance", label: "출석체크", detail: "오늘 +100P", tone: "mint", section: "attendance" },
+  { icon: "ticket", label: "내 쿠폰", detail: "3장 보유", tone: "coral", section: "coupons" },
+  { icon: "points", label: "포인트", detail: "2,450P", tone: "blue", section: "points" },
+  { icon: "store", label: "매장정보", detail: "영업중", tone: "sand", section: "store" },
 ];
 
 type StorefrontProps = {
@@ -16,6 +17,7 @@ type StorefrontProps = {
 };
 
 export function Storefront({ store }: StorefrontProps) {
+  const router = useRouter();
   const [gameOpen, setGameOpen] = useState(false);
   const [won, setWon] = useState(false);
   const [toast, setToast] = useState("");
@@ -111,13 +113,7 @@ export function Storefront({ store }: StorefrontProps) {
             <button
               className="quick-item"
               key={menu.label}
-              onClick={() => {
-                if (menu.target) {
-                  document.getElementById(menu.target)?.scrollIntoView({ behavior: "smooth", block: "start" });
-                  return;
-                }
-                notify(`${menu.label} 메뉴를 준비 중이에요.`);
-              }}
+              onClick={() => router.push(`/s/${store.publicCode}/${menu.section}`)}
             >
               <span className={`quick-icon ${menu.tone}`}>
                 <span className={`menu-icon ${menu.icon}`} aria-hidden="true" />
@@ -135,7 +131,7 @@ export function Storefront({ store }: StorefrontProps) {
                 <span>MY COUPONS</span>
                 <h2>내 쿠폰함</h2>
               </div>
-              <button onClick={() => notify("전체 쿠폰함을 준비 중이에요.")}>전체보기</button>
+              <button onClick={() => router.push(`/s/${store.publicCode}/coupons`)}>전체보기</button>
             </div>
             <div className="coupon-list">
               {store.coupons.map((coupon) => (
