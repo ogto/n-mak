@@ -62,10 +62,6 @@ export function Storefront({ store }: StorefrontProps) {
               <span>{store.tagline}</span>
             </div>
           </div>
-          <button className="icon-button" aria-label="알림">
-            <span className="bell" aria-hidden="true" />
-            <b />
-          </button>
         </header>
 
         <div className="welcome">
