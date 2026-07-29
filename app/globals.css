@@ -26,6 +26,8 @@ html {
 body {
   min-height: 100svh;
   margin: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
   background: #d9e5e6;
   color: var(--ink);
   font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
@@ -46,9 +48,12 @@ button {
 
 .app-shell {
   width: 100%;
+  height: auto;
   min-height: 100svh;
+  max-height: none;
   background: var(--cream);
-  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
   padding-bottom: env(safe-area-inset-bottom);
 }
 
@@ -1161,6 +1166,7 @@ button {
   max-width: none;
   height: 100dvh;
   min-height: 0;
+  max-height: 100dvh;
   display: block;
   overflow: hidden;
   padding: 0;
@@ -2456,6 +2462,7 @@ button {
     max-width: none;
     height: 100svh;
     min-height: 0;
+    max-height: 100svh;
     margin: 0;
     border-radius: 0;
     box-shadow: none;
@@ -2571,6 +2578,30 @@ button {
 
   .detail-coupon-list .coupon:last-child:nth-child(odd) {
     grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 600px) and (max-width: 899px) {
+  .hero {
+    min-height: 0;
+    padding-bottom: 48px;
+  }
+
+  .welcome {
+    margin-top: 36px;
+  }
+
+  .game-card {
+    height: 250px;
+  }
+
+  .quick-grid {
+    margin-top: 28px;
+  }
+
+  .quick-item {
+    min-height: 154px;
+    padding-block: 16px;
   }
 }
 
