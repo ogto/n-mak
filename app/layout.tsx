@@ -9,19 +9,11 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     metadataBase: new URL(`${protocol}://${host}`),
-    title: "파도상회 | 오늘 바다, 오늘 한 접시",
-    description: "게임으로 즐기고, 쿠폰과 포인트로 다시 찾는 파도상회 멤버십",
-    openGraph: {
-      title: "파도상회",
-      description: "게임으로 즐기고, 혜택으로 다시 만나요",
-      images: [{ url: "/og.png", width: 1664, height: 936, alt: "파도상회 멤버십" }],
+    title: {
+      default: "어시장브라더스",
+      template: "%s | 매장 멤버십",
     },
-    twitter: {
-      card: "summary_large_image",
-      title: "파도상회",
-      description: "게임으로 즐기고, 혜택으로 다시 만나요",
-      images: ["/og.png"],
-    },
+    description: "게임으로 즐기고, 쿠폰과 포인트로 다시 만나는 매장 멤버십",
   };
 }
 
