@@ -166,6 +166,7 @@ export function Storefront({ store }: StorefrontProps) {
                 width={1456}
                 height={1086}
                 priority
+                unoptimized
               />
             </div>
             <div className="promo-body">
