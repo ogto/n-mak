@@ -987,6 +987,52 @@ button {
   animation: rise .32s ease-out;
 }
 
+.promo-backdrop {
+  z-index: 60;
+}
+
+.promo-modal {
+  max-height: calc(100dvh - 36px);
+  padding: 0;
+  overflow: auto;
+  text-align: left;
+  overscroll-behavior: contain;
+}
+
+.promo-image-wrap {
+  position: relative;
+  overflow: hidden;
+  background: #dcecff;
+}
+
+.promo-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.promo-body {
+  padding: 24px 26px 26px;
+}
+
+.promo-body h2 {
+  margin: 7px 0 8px;
+  font-size: 29px;
+  line-height: 1.12;
+  letter-spacing: -.06em;
+}
+
+.promo-body > p {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.promo-body .primary-button {
+  margin-top: 8px;
+}
+
 @keyframes rise {
   from { opacity: 0; transform: translateY(35px); }
 }

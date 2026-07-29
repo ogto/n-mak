@@ -1,7 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import type { CSSProperties } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { StoreConfig } from "../../lib/stores";
 
@@ -19,8 +20,18 @@ type StorefrontProps = {
 export function Storefront({ store }: StorefrontProps) {
   const router = useRouter();
   const [gameOpen, setGameOpen] = useState(false);
+  const [promoOpen, setPromoOpen] = useState(false);
   const [won, setWon] = useState(false);
   const [toast, setToast] = useState("");
+
+  useEffect(() => {
+    if (store.internalKey !== "a-fish-brothers") return;
+
+    const storageKey = `promoSeen:${store.publicCode}:cold-noodle`;
+    if (window.sessionStorage.getItem(storageKey) !== "1") {
+      setPromoOpen(true);
+    }
+  }, [store.internalKey, store.publicCode]);
 
   const theme = {
     "--navy": store.theme.navy,
@@ -44,6 +55,11 @@ export function Storefront({ store }: StorefrontProps) {
   const saveCoupon = () => {
     setGameOpen(false);
     notify("쿠폰함에 저장했어요!", 2200);
+  };
+
+  const closePromo = () => {
+    window.sessionStorage.setItem(`promoSeen:${store.publicCode}:cold-noodle`, "1");
+    setPromoOpen(false);
   };
 
   return (
@@ -138,6 +154,29 @@ export function Storefront({ store }: StorefrontProps) {
           </section>
         </div>
       </section>
+
+      {promoOpen && (
+        <div className="modal-backdrop promo-backdrop">
+          <section className="game-modal promo-modal" role="dialog" aria-modal="true" aria-labelledby="promo-title">
+            <div className="promo-image-wrap">
+              <Image
+                className="promo-image"
+                src="/stores/fish-brothers/cold-noodle-promo.png"
+                alt="전복에 빠진 냉 비빔물국수 신메뉴"
+                width={1456}
+                height={1086}
+                priority
+              />
+            </div>
+            <div className="promo-body">
+              <span className="modal-eyebrow">NEW MENU</span>
+              <h2 id="promo-title">시원하고 칼칼한<br />여름 신메뉴</h2>
+              <p>전복과 아삭한 채소를 푸짐하게 담은 냉 비빔물국수를 만나보세요.</p>
+              <button className="primary-button" onClick={closePromo}>확인</button>
+            </div>
+          </section>
+        </div>
+      )}
 
       {gameOpen && (
         <div className="modal-backdrop" role="presentation" onMouseDown={() => setGameOpen(false)}>
