@@ -5,10 +5,10 @@ import { useState } from "react";
 import type { StoreConfig } from "../../lib/stores";
 
 const quickMenus = [
-  { icon: "◷", label: "출석체크", detail: "오늘 +100P", tone: "mint" },
-  { icon: "%", label: "내 쿠폰", detail: "3장 보유", tone: "coral" },
-  { icon: "P", label: "포인트", detail: "2,450P", tone: "blue" },
-  { icon: "⌁", label: "매장정보", detail: "영업중", tone: "sand" },
+  { icon: "attendance", label: "출석체크", detail: "오늘 +100P", tone: "mint" },
+  { icon: "coupon", label: "내 쿠폰", detail: "3장 보유", tone: "coral", target: "coupons" },
+  { icon: "points", label: "포인트", detail: "2,450P", tone: "blue" },
+  { icon: "store", label: "매장정보", detail: "영업중", tone: "sand" },
 ];
 
 type StorefrontProps = {
@@ -66,7 +66,7 @@ export function Storefront({ store }: StorefrontProps) {
 
         <div className="welcome">
           <div className="welcome-copy">
-            <span className="eyebrow">WELCOME, 민지님</span>
+            <span className="eyebrow">WELCOME</span>
             <h1>
               오늘의 행운을
               <br />
@@ -76,6 +76,9 @@ export function Storefront({ store }: StorefrontProps) {
           </div>
 
           <button className="game-card" onClick={playGame}>
+            {store.game.artSrc ? (
+              <img className="game-art" src={store.game.artSrc} alt="" aria-hidden="true" />
+            ) : null}
             <span className="game-label">오늘의 게임</span>
             <span className="game-title">
               {store.game.title.split("\n").map((line) => (
@@ -83,10 +86,6 @@ export function Storefront({ store }: StorefrontProps) {
               ))}
             </span>
             <span className="game-cta">도전하기 <b>→</b></span>
-            <span className="sun" aria-hidden="true" />
-            <span className="wave wave-one" aria-hidden="true" />
-            <span className="wave wave-two" aria-hidden="true" />
-            <span className="fish" aria-hidden="true" />
           </button>
         </div>
       </section>
@@ -109,8 +108,20 @@ export function Storefront({ store }: StorefrontProps) {
 
         <div className="quick-grid" aria-label="빠른 메뉴">
           {quickMenus.map((menu) => (
-            <button className="quick-item" key={menu.label} onClick={() => notify(`${menu.label} 메뉴를 준비 중이에요.`)}>
-              <span className={`quick-icon ${menu.tone}`}>{menu.icon}</span>
+            <button
+              className="quick-item"
+              key={menu.label}
+              onClick={() => {
+                if (menu.target) {
+                  document.getElementById(menu.target)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  return;
+                }
+                notify(`${menu.label} 메뉴를 준비 중이에요.`);
+              }}
+            >
+              <span className={`quick-icon ${menu.tone}`}>
+                <span className={`menu-icon ${menu.icon}`} aria-hidden="true" />
+              </span>
               <strong>{menu.label}</strong>
               <small>{menu.detail}</small>
             </button>
@@ -121,8 +132,8 @@ export function Storefront({ store }: StorefrontProps) {
           <section className="coupon-section" id="coupons">
             <div className="section-heading">
               <div>
-                <span>FOR YOU</span>
-                <h2>지금 쓸 수 있는 혜택</h2>
+                <span>MY COUPONS</span>
+                <h2>내 쿠폰함</h2>
               </div>
               <button onClick={() => notify("전체 쿠폰함을 준비 중이에요.")}>전체보기</button>
             </div>
@@ -158,17 +169,7 @@ export function Storefront({ store }: StorefrontProps) {
             </button>
           </section>
         </div>
-
-        <p className="footer-note">{store.displayName} {store.branchName} · {store.address}</p>
       </section>
-
-      <nav className="bottom-nav" aria-label="주요 메뉴">
-        <a className="active" href="#home"><span>⌂</span>홈</a>
-        <a href="#coupons"><span>%</span>혜택</a>
-        <button onClick={playGame} aria-label="게임 열기"><span className="nav-game">✦</span>게임</button>
-        <a href="#channel"><span>◌</span>소식</a>
-        <button onClick={() => notify("마이페이지를 준비 중이에요.")}><span>○</span>MY</button>
-      </nav>
 
       {gameOpen && (
         <div className="modal-backdrop" role="presentation" onMouseDown={() => setGameOpen(false)}>

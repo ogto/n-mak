@@ -27,6 +27,7 @@ export type StoreConfig = {
     eyebrow: string;
     title: string;
     prize: string;
+    artSrc?: string;
   };
   coupons: StoreCoupon[];
 };
@@ -57,6 +58,7 @@ const storesByPublicCode: Record<string, StoreConfig> = {
       eyebrow: "TODAY'S CATCH",
       title: "행운의\n대어잡기",
       prize: "모둠회 10% 할인",
+      artSrc: "/stores/fish-brothers/fishing-game-banner.png",
     },
     coupons: [
       {

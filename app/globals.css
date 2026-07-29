@@ -47,7 +47,7 @@ button {
   min-height: 100vh;
   background: var(--cream);
   overflow: hidden;
-  padding-bottom: calc(158px + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .hero {
@@ -85,8 +85,7 @@ button {
 
 .topbar,
 .welcome,
-.content,
-.bottom-nav {
+.content {
   max-width: 1040px;
   margin-inline: auto;
 }
@@ -259,6 +258,31 @@ button {
   background: linear-gradient(150deg, #71e1d1 0%, #bbeade 100%);
   box-shadow: 0 18px 45px rgba(0, 11, 22, .24);
   transition: transform .2s ease;
+}
+
+.game-card::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(134, 222, 211, .98) 0%,
+    rgba(134, 222, 211, .94) 38%,
+    rgba(134, 222, 211, .52) 58%,
+    rgba(134, 222, 211, 0) 78%
+  );
+  pointer-events: none;
+}
+
+.game-art {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .game-card:active {
@@ -487,6 +511,131 @@ button {
 .quick-icon.blue { background: #dcebf2; color: #155d81; }
 .quick-icon.sand { background: #eee7d9; color: #846f47; }
 
+.menu-icon {
+  position: relative;
+  display: block;
+  width: 34px;
+  height: 34px;
+  color: currentColor;
+}
+
+.menu-icon.attendance {
+  border: 3px solid currentColor;
+  border-radius: 9px;
+}
+
+.menu-icon.attendance::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  right: 0;
+  left: 0;
+  border-top: 3px solid currentColor;
+  box-shadow: 7px -10px 0 -5px currentColor, 24px -10px 0 -5px currentColor;
+}
+
+.menu-icon.attendance::after {
+  content: "";
+  position: absolute;
+  width: 11px;
+  height: 6px;
+  left: 8px;
+  bottom: 7px;
+  border-bottom: 3px solid currentColor;
+  border-left: 3px solid currentColor;
+  transform: rotate(-45deg);
+}
+
+.menu-icon.coupon {
+  width: 38px;
+  height: 28px;
+  margin-top: 3px;
+  border: 3px solid currentColor;
+  border-radius: 8px;
+}
+
+.menu-icon.coupon::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 11px;
+  border-left: 2px dashed currentColor;
+}
+
+.menu-icon.coupon::after {
+  content: "%";
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.menu-icon.points {
+  border: 3px solid currentColor;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 4px rgba(255,255,255,.45);
+}
+
+.menu-icon.points::before {
+  content: "P";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.menu-icon.points::after {
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  top: 4px;
+  right: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.menu-icon.store {
+  width: 38px;
+  height: 30px;
+  margin-top: 4px;
+  border: 3px solid currentColor;
+  border-top: 0;
+  border-radius: 0 0 5px 5px;
+}
+
+.menu-icon.store::before {
+  content: "";
+  position: absolute;
+  width: 42px;
+  height: 11px;
+  top: -8px;
+  left: -5px;
+  border: 3px solid currentColor;
+  border-radius: 7px 7px 5px 5px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0 7px,
+    currentColor 7px 10px,
+    transparent 10px 17px
+  );
+}
+
+.menu-icon.store::after {
+  content: "";
+  position: absolute;
+  width: 9px;
+  height: 13px;
+  right: 4px;
+  bottom: 0;
+  border: 2px solid currentColor;
+  border-bottom: 0;
+}
+
 .quick-item strong {
   font-size: 15px;
   letter-spacing: -.04em;
@@ -501,6 +650,10 @@ button {
 .tablet-grid {
   display: grid;
   gap: 30px;
+}
+
+.coupon-section {
+  scroll-margin-top: 24px;
 }
 
 .section-heading {
@@ -934,7 +1087,7 @@ button {
   position: fixed;
   z-index: 80;
   left: 50%;
-  bottom: calc(88px + env(safe-area-inset-bottom));
+  bottom: calc(24px + env(safe-area-inset-bottom));
   width: max-content;
   max-width: calc(100% - 40px);
   padding: 15px 21px;
