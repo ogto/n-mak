@@ -1180,16 +1180,18 @@ button {
   gap: 13px;
   padding: max(16px, env(safe-area-inset-top)) 18px 8px;
   color: white;
-  background: linear-gradient(180deg, rgba(3,26,40,.64), transparent);
+  background: linear-gradient(180deg, rgba(3,26,40,.9) 0%, rgba(3,26,40,.48) 76%, transparent 100%);
+  text-shadow: 0 2px 8px rgba(0,18,30,.7);
 }
 
 .fishing-header > button {
   width: 48px;
   height: 48px;
   color: white;
-  border: 1px solid rgba(255,255,255,.18);
+  border: 1px solid rgba(255,255,255,.38);
   border-radius: 50%;
-  background: rgba(255,255,255,.09);
+  background: rgba(4,39,56,.56);
+  box-shadow: 0 6px 18px rgba(1,24,37,.18);
   font-size: 24px;
 }
 
@@ -1207,7 +1209,7 @@ button {
 
 .fishing-header div span {
   overflow: hidden;
-  color: rgba(255,255,255,.55);
+  color: rgba(255,255,255,.82);
   font-size: 10px;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -1215,10 +1217,11 @@ button {
 
 .game-attempt {
   padding: 7px 10px;
-  color: var(--aqua);
-  border: 1px solid rgba(99,214,232,.22);
+  color: #8afff5;
+  border: 1px solid rgba(138,255,245,.5);
   border-radius: 999px;
-  background: rgba(99,214,232,.08);
+  background: rgba(4,58,76,.66);
+  box-shadow: 0 5px 16px rgba(1,24,37,.14);
   font-size: 10px;
   font-weight: 900;
   white-space: nowrap;
@@ -1232,11 +1235,12 @@ button {
   left: 0;
   padding: 12px 22px;
   color: white;
+  text-shadow: 0 3px 14px rgba(0,22,35,.82);
   pointer-events: none;
 }
 
 .fishing-copy > span {
-  color: var(--aqua);
+  color: #64fff3;
   font-size: 10px;
   font-weight: 900;
   letter-spacing: .16em;
@@ -1247,12 +1251,14 @@ button {
   font-size: clamp(27px, 8vw, 39px);
   line-height: 1.05;
   letter-spacing: -.065em;
+  font-weight: 900;
 }
 
 .fishing-copy p {
   margin: 0;
-  color: rgba(255,255,255,.58);
+  color: rgba(255,255,255,.9);
   font-size: 12px;
+  font-weight: 600;
   line-height: 1.5;
 }
 
@@ -1294,6 +1300,14 @@ button {
   z-index: 10;
   inset: 0;
   border-radius: inherit;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(3,29,43,.8) 0%,
+      rgba(3,36,51,.58) 18%,
+      rgba(3,38,52,.2) 34%,
+      transparent 48%
+    );
   box-shadow: inset 0 0 55px rgba(0,61,84,.12);
   pointer-events: none;
 }
