@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { detailSections, StoreDetail, type DetailSection } from "../../../components/StoreDetail";
+import { StoreDetail, type DetailSection } from "../../../components/StoreDetail";
 import { getStoreByPublicCode } from "../../../../lib/stores";
+
+const detailSections = new Set(["attendance", "coupons", "points", "store"]);
 
 type DetailPageProps = {
   params: Promise<{ publicCode: string; section: string }>;
@@ -26,7 +28,7 @@ export default async function DetailPage({ params }: DetailPageProps) {
   const { publicCode, section } = await params;
   const store = await getStoreByPublicCode(publicCode);
 
-  if (!store || !detailSections.includes(section as DetailSection)) {
+  if (!store || !detailSections.has(section)) {
     notFound();
   }
 

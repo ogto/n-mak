@@ -5,8 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { StoreConfig } from "../../lib/stores";
 
-export const detailSections = ["attendance", "coupons", "points", "store"] as const;
-export type DetailSection = (typeof detailSections)[number];
+export type DetailSection = "attendance" | "coupons" | "points" | "store";
 
 const detailMeta: Record<DetailSection, { eyebrow: string; title: string; description: string; icon: string; tone: string }> = {
   attendance: {
