@@ -140,7 +140,11 @@ export function FishingGame({ store }: FishingGameProps) {
         <span className="game-cloud cloud-two" aria-hidden="true" />
         <span className="distant-island" aria-hidden="true" />
         <span className="fishing-rod" aria-hidden="true" />
-        <span className="fishing-line" aria-hidden="true"><i /></span>
+        <span className="fishing-line" aria-hidden="true">
+          <b className="line-float" />
+          <em className="line-sinker" />
+          <i />
+        </span>
         <span className="game-boat" aria-hidden="true"><i /></span>
         <span className="boat-wake" aria-hidden="true" />
         <span className="ocean-wave wave-back" aria-hidden="true" />

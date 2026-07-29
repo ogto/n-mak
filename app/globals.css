@@ -1457,15 +1457,44 @@ button {
 .fishing-rod {
   position: absolute;
   z-index: 6;
-  width: 105px;
-  height: 4px;
+  width: 106px;
+  height: 6px;
   left: 104px;
   top: calc(45% - 31px);
   border-radius: 999px;
-  background: #263c41;
+  background: linear-gradient(180deg, #334f54 0%, #142b31 72%, #0b2026 100%);
+  clip-path: polygon(0 10%, 100% 35%, 100% 66%, 0 100%);
+  filter: drop-shadow(0 2px 1px rgba(3,31,39,.24));
   transform: rotate(-23deg);
   transform-origin: left center;
   transition: transform .5s ease;
+}
+
+.fishing-rod::before {
+  content: "";
+  position: absolute;
+  width: 28px;
+  height: 10px;
+  left: -17px;
+  top: -2px;
+  border-radius: 8px 3px 3px 8px;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,.16) 0 2px, transparent 2px 5px),
+    linear-gradient(180deg, #c68a50, #765033);
+  box-shadow: inset 0 -2px 0 rgba(63,34,18,.22);
+}
+
+.fishing-rod::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  left: 19px;
+  top: 5px;
+  border: 3px solid #20383e;
+  border-radius: 50%;
+  background: radial-gradient(circle, #f2b957 0 22%, #48656a 25% 48%, #dbe3df 51% 100%);
+  box-shadow: 7px 7px 0 -5px #20383e;
 }
 
 .fishing-line {
@@ -1475,58 +1504,116 @@ button {
   height: 122px;
   left: 198px;
   top: calc(45% - 68px);
-  border-left: 2px solid rgba(18,40,47,.76);
+  border-left: 1.5px solid rgba(10,40,49,.82);
+  filter: drop-shadow(1px 0 0 rgba(255,255,255,.18));
   transform-origin: top;
-  transition: height .5s ease, transform .5s ease;
+  transition: height .5s ease;
+}
+
+.fishing-line .line-float {
+  position: absolute;
+  width: 10px;
+  height: 18px;
+  right: -5px;
+  bottom: 17px;
+  overflow: hidden;
+  border: 1px solid rgba(8,44,54,.24);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ff6257 0 48%, #fff9e9 49% 100%);
+  box-shadow: 0 2px 4px rgba(4,42,52,.2);
+}
+
+.fishing-line .line-float::before {
+  content: "";
+  position: absolute;
+  width: 2px;
+  height: 5px;
+  left: 3px;
+  top: -4px;
+  border-radius: 2px;
+  background: #1d4048;
+}
+
+.fishing-line .line-sinker {
+  position: absolute;
+  width: 5px;
+  height: 7px;
+  right: -3px;
+  bottom: 5px;
+  border-radius: 50% 50% 55% 55%;
+  background: linear-gradient(135deg, #718084, #263b41);
+  box-shadow: inset 1px 1px rgba(255,255,255,.28);
 }
 
 .fishing-line i {
   position: absolute;
-  width: 12px;
-  height: 15px;
-  right: -7px;
-  bottom: -11px;
-  border-right: 3px solid #263c41;
-  border-bottom: 3px solid #263c41;
-  border-radius: 0 0 9px 0;
+  width: 13px;
+  height: 17px;
+  right: -8px;
+  bottom: -15px;
+  border-right: 2.5px solid #182f36;
+  border-bottom: 2.5px solid #182f36;
+  border-radius: 0 0 10px 0;
+  filter: drop-shadow(1px 1px 0 rgba(255,255,255,.15));
+}
+
+.fishing-line i::after {
+  content: "";
+  position: absolute;
+  width: 7px;
+  height: 2px;
+  right: -1px;
+  bottom: 0;
+  border-radius: 2px;
+  background: #182f36;
+  transform: rotate(-33deg);
+  transform-origin: right center;
 }
 
 .phase-ready .fishing-line {
-  height: 26px;
-  transform: translate(-62px, 11px);
+  height: 52px;
 }
 
 .phase-ready .fishing-rod {
-  transform: rotate(-37deg);
+  transform: rotate(-23deg);
 }
 
 .phase-casting .fishing-rod {
-  animation: rodCast .8s ease-out;
+  animation: rodCast .78s cubic-bezier(.22,.72,.18,1);
 }
 
 .phase-casting .fishing-line {
-  animation: lineCast .85s ease-out;
+  animation: lineRelease .62s .2s cubic-bezier(.2,.78,.2,1) both;
 }
 
 @keyframes rodCast {
-  0% { transform: rotate(-42deg); }
-  45% { transform: rotate(12deg); }
+  0% { transform: rotate(-34deg); }
+  42% { transform: rotate(3deg); }
+  72% { transform: rotate(-27deg); }
   100% { transform: rotate(-23deg); }
 }
 
-@keyframes lineCast {
-  0% { height: 18px; transform: translate(-70px, 10px); }
-  55% { height: 50px; transform: translate(98px, 14px) rotate(-18deg); }
-  100% { height: 122px; transform: translate(0); }
+@keyframes lineRelease {
+  0% { height: 14px; opacity: 0; }
+  24% { opacity: 1; }
+  70% { height: 132px; }
+  100% { height: 122px; opacity: 1; }
 }
 
 .phase-catching .fishing-rod {
-  transform: rotate(-47deg);
+  animation: rodPull 1.45s cubic-bezier(.2,.75,.22,1) forwards;
 }
 
 .phase-catching .fishing-line {
-  height: 45px;
-  transform: translate(-28px, -5px);
+  animation: lineReel 1.45s cubic-bezier(.2,.75,.22,1) forwards;
+}
+
+.phase-result .fishing-rod {
+  transform: rotate(-25deg);
+}
+
+.phase-result .fishing-line {
+  height: 44px;
 }
 
 .phase-timing .fishing-rod {
@@ -1543,6 +1630,19 @@ button {
 
 @keyframes hookNibble {
   to { transform: translateY(7px) rotate(8deg); }
+}
+
+@keyframes rodPull {
+  0% { transform: rotate(-23deg); }
+  34% { transform: rotate(-29deg); }
+  68% { transform: rotate(-20deg); }
+  100% { transform: rotate(-25deg); }
+}
+
+@keyframes lineReel {
+  0% { height: 122px; }
+  22% { height: 128px; }
+  100% { height: 44px; }
 }
 
 .ocean-wave {
@@ -1644,8 +1744,8 @@ button {
   z-index: 9;
   width: 72px;
   height: 42px;
-  left: 49%;
-  top: 60%;
+  left: 174px;
+  top: calc(45% - 22px);
   border-radius: 65% 42% 42% 65%;
   background: linear-gradient(135deg, #ff947c, #e65750);
   box-shadow: 0 10px 15px rgba(2,35,53,.18);
@@ -1703,17 +1803,17 @@ button {
 }
 
 @keyframes fishRise {
-  0% { transform: translateY(90px) rotate(-16deg) scale(.7); opacity: 0; }
+  0% { transform: translate(82px,190px) rotate(-16deg) scale(.7); opacity: 0; }
   35% { opacity: 1; }
-  70% { transform: translate(-45px,-115px) rotate(18deg) scale(1.15); }
-  100% { transform: translate(-70px,-145px) rotate(-8deg) scale(1); }
+  70% { transform: translate(9px,18px) rotate(18deg) scale(1.15); }
+  100% { transform: translate(0,0) rotate(-8deg) scale(1); }
 }
 
 @keyframes goldenFishRise {
-  0% { transform: translateY(90px) rotate(-16deg) scale(.6); opacity: 0; filter: brightness(1); }
+  0% { transform: translate(82px,190px) rotate(-16deg) scale(.6); opacity: 0; filter: brightness(1); }
   35% { opacity: 1; filter: brightness(1.8); }
-  70% { transform: translate(-45px,-115px) rotate(18deg) scale(1.35); filter: brightness(1.25); }
-  100% { transform: translate(-70px,-145px) rotate(-8deg) scale(1.08); filter: brightness(1.1); }
+  70% { transform: translate(9px,18px) rotate(18deg) scale(1.35); filter: brightness(1.25); }
+  100% { transform: translate(0,0) rotate(-8deg) scale(1.08); filter: brightness(1.1); }
 }
 
 .miss-splash {
