@@ -121,25 +121,20 @@ export function FishingGame({ store }: FishingGameProps) {
   };
 
   return (
-    <main className={`app-shell fishing-shell game-${phase}`} style={theme}>
-      <header className="fishing-header">
-        <button onClick={() => router.push(`/s/${store.publicCode}`)} aria-label="홈으로 돌아가기">←</button>
-        <div><strong>행운의 대어잡기</strong><span>{store.displayName} {store.branchName}</span></div>
-        <span className="game-attempt">무료 도전</span>
-      </header>
+    <main className={`app-shell fishing-shell fishing-phase-${phase}`} style={theme}>
+      <section className={`fishing-stage phase-${phase}`}>
+        <header className="fishing-header">
+          <button onClick={() => router.push(`/s/${store.publicCode}`)} aria-label="홈으로 돌아가기">←</button>
+          <div><strong>행운의 대어잡기</strong><span>{store.displayName} {store.branchName}</span></div>
+          <span className="game-attempt">무료 도전</span>
+        </header>
 
-      <section className="fishing-copy" aria-live="polite">
-        <span>LUCKY FISHING</span>
-        <h1>{phaseCopy[phase].title}</h1>
-        <p>{phaseCopy[phase].description}</p>
-      </section>
+        <div className="fishing-copy" aria-live="polite">
+          <span>LUCKY FISHING</span>
+          <h1>{phaseCopy[phase].title}</h1>
+          <p>{phaseCopy[phase].description}</p>
+        </div>
 
-      <button
-        className={`fishing-stage phase-${phase}`}
-        onClick={handleStageTap}
-        disabled={phase === "casting" || phase === "catching" || phase === "result" || phase === "miss"}
-        aria-label={phase === "ready" ? "낚싯줄 던지기" : phase === "timing" ? "물고기 낚아 올리기" : undefined}
-      >
         <span className="game-sun" aria-hidden="true" />
         <span className="game-cloud cloud-one" aria-hidden="true" />
         <span className="game-cloud cloud-two" aria-hidden="true" />
@@ -156,45 +151,50 @@ export function FishingGame({ store }: FishingGameProps) {
           <span className={`game-caught-fish ${reward?.golden ? "golden" : ""}`} aria-hidden="true"><i /></span>
         )}
         {phase === "miss" && <span className="miss-splash" aria-hidden="true">⌁</span>}
-        <span className="stage-action">
-          {phase === "ready" && "화면을 탭하세요"}
-          {phase === "casting" && "낚싯줄 던지는 중…"}
-          {phase === "timing" && "초록 영역에서 탭!"}
-          {phase === "catching" && "낚아 올리는 중…"}
-          {phase === "miss" && "아쉽게 놓쳤어요"}
-          {phase === "result" && "낚시 성공!"}
-        </span>
-      </button>
 
-      {(phase === "timing" || phase === "catching") && (
-        <section className="fishing-gauge" aria-label={`낚시 타이밍 ${gauge}퍼센트`}>
-          <div className="gauge-label"><strong>HOOK TIMING</strong><span>초록 영역을 노리세요</span></div>
-          <div className="gauge-track">
-            <span className="gauge-success" />
-            <i className="gauge-needle" />
-          </div>
-        </section>
-      )}
+        <button
+          className="game-tap-surface"
+          onClick={handleStageTap}
+          disabled={phase === "casting" || phase === "catching" || phase === "result" || phase === "miss"}
+          aria-label={phase === "ready" ? "낚싯줄 던지기" : phase === "timing" ? "물고기 낚아 올리기" : undefined}
+        >
+          <span className="stage-action">
+            {phase === "ready" && "화면을 탭하세요"}
+            {phase === "casting" && "낚싯줄 던지는 중…"}
+            {phase === "timing" && "초록 영역에서 탭!"}
+            {phase === "catching" && "낚아 올리는 중…"}
+          </span>
+        </button>
 
-      {phase === "miss" && (
-        <section className="game-result miss-result">
-          <span>SO CLOSE!</span>
-          <h2>조금만 더 정확하게!</h2>
-          <p>바늘이 가운데 초록색 영역에 들어왔을 때 탭하면 물고기를 낚을 수 있어요.</p>
-          <button onClick={resetGame}>다시 도전하기</button>
-        </section>
-      )}
+        {(phase === "timing" || phase === "catching") && (
+          <section className="fishing-gauge" aria-label={`낚시 타이밍 ${gauge}퍼센트`}>
+            <div className="gauge-label"><strong>HOOK TIMING</strong><span>초록 영역을 노리세요</span></div>
+            <div className="gauge-track">
+              <span className="gauge-success" />
+              <i className="gauge-needle" />
+            </div>
+          </section>
+        )}
 
-      {phase === "result" && reward && (
-        <section className={`game-result reward-${reward.tone} ${reward.golden ? "golden-result" : ""}`}>
-          <span>{reward.golden ? "LEGENDARY REWARD · 5%" : "TODAY'S REWARD"}</span>
-          <h2>{reward.name}</h2>
-          <p>{reward.description}</p>
-          <button onClick={() => setClaimed(true)} disabled={claimed}>{claimed ? "보상 저장 완료" : "보상 받기"}</button>
-          <button className="game-retry" onClick={resetGame}>다시 해보기</button>
-        </section>
-      )}
+        {phase === "miss" && (
+          <section className="game-result miss-result">
+            <span>SO CLOSE!</span>
+            <h2>조금만 더 정확하게!</h2>
+            <p>바늘이 가운데 초록색 영역에 들어왔을 때 탭하면 물고기를 낚을 수 있어요.</p>
+            <button onClick={resetGame}>다시 도전하기</button>
+          </section>
+        )}
 
+        {phase === "result" && reward && (
+          <section className={`game-result reward-${reward.tone} ${reward.golden ? "golden-result" : ""}`}>
+            <span>{reward.golden ? "LEGENDARY REWARD · 5%" : "TODAY'S REWARD"}</span>
+            <h2>{reward.name}</h2>
+            <p>{reward.description}</p>
+            <button onClick={() => setClaimed(true)} disabled={claimed}>{claimed ? "보상 저장 완료" : "보상 받기"}</button>
+            <button className="game-retry" onClick={resetGame}>다시 해보기</button>
+          </section>
+        )}
+      </section>
     </main>
   );
 }
