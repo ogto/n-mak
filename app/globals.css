@@ -116,12 +116,13 @@ button {
 
 .brand-logo-box {
   width: 188px;
-  height: 66px;
+  height: 76px;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  overflow: hidden;
+  overflow: visible;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -129,13 +130,13 @@ button {
 }
 
 .brand-logo {
-  width: 125%;
+  width: 110%;
   max-width: none;
   height: auto;
   flex: 0 0 auto;
   filter: brightness(0) invert(1);
   opacity: .96;
-  transform: translateY(-1px);
+  transform: none;
 }
 
 .brand-wordmark {
@@ -2451,9 +2452,9 @@ button {
 @media (min-width: 600px) {
   .app-shell {
     max-width: 1180px;
-    min-height: calc(100svh - 48px);
-    margin: 24px auto;
-    border-radius: 34px;
+    min-height: 100svh;
+    margin: 0 auto 24px;
+    border-radius: 0 0 34px 34px;
     box-shadow: 0 25px 80px rgba(14, 50, 61, .15);
   }
 
@@ -2471,7 +2472,7 @@ button {
   .hero {
     min-height: 470px;
     padding: max(38px, calc(env(safe-area-inset-top) + 22px)) 40px 76px;
-    border-radius: 34px;
+    border-radius: 0 0 34px 34px;
   }
 
   .detail-header,
@@ -2490,7 +2491,7 @@ button {
 
   .brand-logo-box {
     width: 226px;
-    height: 76px;
+    height: 88px;
   }
 
   .welcome h1 {
