@@ -94,29 +94,31 @@ button {
 .topbar {
   position: relative;
   z-index: 2;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
+  gap: 16px;
 }
 
 .brand {
+  min-width: 0;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 .brand-logo-box {
-  width: 172px;
-  height: 62px;
+  width: 188px;
+  height: 66px;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,.18);
-  border-radius: 14px;
-  background: rgba(255,255,255,.96);
-  box-shadow: 0 8px 22px rgba(0, 15, 25, .14);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .brand-logo {
@@ -124,6 +126,8 @@ button {
   max-width: none;
   height: auto;
   flex: 0 0 auto;
+  filter: brightness(0) invert(1);
+  opacity: .96;
   transform: translateY(-1px);
 }
 
@@ -137,17 +141,23 @@ button {
 }
 
 .branch-copy {
+  min-width: 0;
   display: flex;
   flex-direction: column;
 }
 
 .branch-copy strong {
+  width: max-content;
+  padding: 5px 9px;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 999px;
+  background: rgba(255,255,255,.08);
   font-size: 14px;
   letter-spacing: -.04em;
 }
 
 .branch-copy span {
-  max-width: 120px;
+  max-width: 105px;
   margin-top: 4px;
   overflow: hidden;
   color: rgba(255,255,255,.62);
@@ -159,6 +169,7 @@ button {
 
 .icon-button {
   position: relative;
+  flex: 0 0 auto;
   width: 50px;
   height: 50px;
   border: 1px solid rgba(255,255,255,.15);
@@ -279,18 +290,24 @@ button {
 .game-cta {
   position: absolute;
   z-index: 4;
-  bottom: 24px;
-  left: 26px;
+  bottom: 20px;
+  left: 22px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  min-height: 44px;
+  padding: 6px 7px 6px 15px;
+  border: 1px solid rgba(5, 39, 57, .08);
+  border-radius: 999px;
+  background: rgba(255,255,255,.9);
+  box-shadow: 0 8px 18px rgba(3, 31, 45, .12);
   font-size: 14px;
   font-weight: 800;
 }
 
 .game-cta b {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   display: grid;
   place-content: center;
   color: white;
@@ -943,8 +960,8 @@ button {
   }
 
   .brand-logo-box {
-    width: 214px;
-    height: 70px;
+    width: 226px;
+    height: 76px;
   }
 
   .welcome h1 {
@@ -1020,7 +1037,7 @@ button {
   }
 
   .brand-logo-box {
-    width: 154px;
+    width: 166px;
     height: 58px;
   }
 
@@ -1029,8 +1046,8 @@ button {
   }
 
   .branch-copy strong {
-    max-width: 55px;
-    font-size: 13px;
+    padding: 4px 8px;
+    font-size: 12px;
   }
 
   .icon-button {
