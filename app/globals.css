@@ -656,6 +656,10 @@ button {
   gap: 30px;
 }
 
+.tablet-grid > .channel-card:only-child {
+  grid-column: 1 / -1;
+}
+
 .coupon-section {
   scroll-margin-top: 24px;
 }

@@ -125,34 +125,6 @@ export function Storefront({ store }: StorefrontProps) {
         </div>
 
         <div className="tablet-grid">
-          <section className="coupon-section" id="coupons">
-            <div className="section-heading">
-              <div>
-                <span>MY COUPONS</span>
-                <h2>내 쿠폰함</h2>
-              </div>
-              <button onClick={() => router.push(`/s/${store.publicCode}/coupons`)}>전체보기</button>
-            </div>
-            <div className="coupon-list">
-              {store.coupons.map((coupon) => (
-                <article className="coupon" key={coupon.title}>
-                  <div className={`coupon-badge ${coupon.color}`}>
-                    <b>{coupon.discount}</b>
-                    <span>COUPON</span>
-                  </div>
-                  <div className="coupon-copy">
-                    <strong>{coupon.title}</strong>
-                    <p>{coupon.description}</p>
-                    <span>{coupon.due}</span>
-                  </div>
-                  <button className="download" aria-label={`${coupon.title} 쿠폰 받기`} onClick={() => notify("쿠폰을 받았어요!")}>
-                    ↓
-                  </button>
-                </article>
-              ))}
-            </div>
-          </section>
-
           <section className="channel-card" id="channel">
             <div className="kakao-symbol" aria-hidden="true">talk</div>
             <div>
