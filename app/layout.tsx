@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import "./globals.css";
 
@@ -16,6 +16,12 @@ export async function generateMetadata(): Promise<Metadata> {
     description: "게임으로 즐기고, 쿠폰과 포인트로 다시 만나는 매장 멤버십",
   };
 }
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 export default function RootLayout({
   children,

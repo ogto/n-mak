@@ -130,7 +130,6 @@ export function FishingGame({ store }: FishingGameProps) {
         </header>
 
         <div className="fishing-copy" aria-live="polite">
-          <span>LUCKY FISHING</span>
           <h1>{phaseCopy[phase].title}</h1>
           <p>{phaseCopy[phase].description}</p>
         </div>
@@ -172,7 +171,7 @@ export function FishingGame({ store }: FishingGameProps) {
 
         {(phase === "timing" || phase === "catching") && (
           <section className="fishing-gauge" aria-label={`낚시 타이밍 ${gauge}퍼센트`}>
-            <div className="gauge-label"><strong>HOOK TIMING</strong><span>초록 영역을 노리세요</span></div>
+            <div className="gauge-label"><span>초록 영역을 노리세요</span></div>
             <div className="gauge-track">
               <span className="gauge-success" />
               <i className="gauge-needle" />
@@ -182,7 +181,6 @@ export function FishingGame({ store }: FishingGameProps) {
 
         {phase === "miss" && (
           <section className="game-result miss-result">
-            <span>SO CLOSE!</span>
             <h2>조금만 더 정확하게!</h2>
             <p>바늘이 가운데 초록색 영역에 들어왔을 때 탭하면 물고기를 낚을 수 있어요.</p>
             <button onClick={resetGame}>다시 도전하기</button>
@@ -191,7 +189,6 @@ export function FishingGame({ store }: FishingGameProps) {
 
         {phase === "result" && reward && (
           <section className={`game-result reward-${reward.tone} ${reward.golden ? "golden-result" : ""}`}>
-            <span>{reward.golden ? "LEGENDARY REWARD · 5%" : "TODAY'S REWARD"}</span>
             <h2>{reward.name}</h2>
             <p>{reward.description}</p>
             <button onClick={() => setClaimed(true)} disabled={claimed}>{claimed ? "보상 저장 완료" : "보상 받기"}</button>

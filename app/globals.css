@@ -19,10 +19,12 @@
 }
 
 html {
+  min-height: 100%;
   scroll-behavior: smooth;
 }
 
 body {
+  min-height: 100svh;
   margin: 0;
   background: #d9e5e6;
   color: var(--ink);
@@ -44,7 +46,7 @@ button {
 
 .app-shell {
   width: 100%;
-  min-height: 100vh;
+  min-height: 100svh;
   background: var(--cream);
   overflow: hidden;
   padding-bottom: env(safe-area-inset-bottom);
@@ -1239,15 +1241,8 @@ button {
   pointer-events: none;
 }
 
-.fishing-copy > span {
-  color: #64fff3;
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: .16em;
-}
-
 .fishing-copy h1 {
-  margin: 6px 0 5px;
+  margin: 0 0 7px;
   font-size: clamp(27px, 8vw, 39px);
   line-height: 1.05;
   letter-spacing: -.065em;
@@ -1256,9 +1251,9 @@ button {
 
 .fishing-copy p {
   margin: 0;
-  color: rgba(255,255,255,.9);
-  font-size: 12px;
-  font-weight: 600;
+  color: rgba(255,255,255,.96);
+  font-size: 13px;
+  font-weight: 700;
   line-height: 1.5;
 }
 
@@ -1857,20 +1852,15 @@ button {
 
 .gauge-label {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 12px;
   margin-bottom: 10px;
 }
 
-.gauge-label strong {
-  color: var(--blue);
-  font-size: 10px;
-  letter-spacing: .12em;
-}
-
 .gauge-label span {
-  color: var(--muted);
-  font-size: 10px;
+  color: #536b76;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .gauge-track {
@@ -1911,24 +1901,20 @@ button {
   text-align: center;
 }
 
-.game-result > span {
-  color: var(--coral);
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: .14em;
-}
-
 .game-result h2 {
-  margin: 5px 0 4px;
-  font-size: 25px;
-  line-height: 1.1;
-  letter-spacing: -.06em;
+  margin: 2px 0 7px;
+  font-size: clamp(31px, 8vw, 38px);
+  font-weight: 950;
+  line-height: 1.05;
+  letter-spacing: -.065em;
 }
 
 .game-result p {
-  margin: 0 0 11px;
-  color: var(--muted);
-  font-size: 12px;
+  margin: 0 0 15px;
+  color: #526875;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.45;
 }
 
 .game-result button {
@@ -1960,7 +1946,6 @@ button {
   box-shadow: 0 12px 42px rgba(212,157,0,.2);
 }
 
-.golden-result > span,
 .golden-result h2 {
   color: #b77800;
 }
@@ -2460,8 +2445,8 @@ button {
 @media (min-width: 600px) {
   .app-shell {
     max-width: 1180px;
-    min-height: calc(100vh - 32px);
-    margin: 16px auto;
+    min-height: calc(100svh - 48px);
+    margin: 24px auto;
     border-radius: 34px;
     box-shadow: 0 25px 80px rgba(14, 50, 61, .15);
   }
@@ -2469,7 +2454,7 @@ button {
   .fishing-shell {
     width: 100%;
     max-width: none;
-    height: 100dvh;
+    height: 100svh;
     min-height: 0;
     margin: 0;
     border-radius: 0;
@@ -2478,8 +2463,17 @@ button {
 
   .hero {
     min-height: 470px;
-    padding-inline: 40px;
+    padding: max(38px, calc(env(safe-area-inset-top) + 22px)) 40px 76px;
     border-radius: 34px;
+  }
+
+  .detail-header,
+  .fishing-header {
+    padding-top: max(30px, calc(env(safe-area-inset-top) + 18px));
+  }
+
+  .fishing-copy {
+    top: max(102px, calc(env(safe-area-inset-top) + 92px));
   }
 
   .welcome {
