@@ -15,6 +15,9 @@ export type StoreConfig = {
   tagline: string;
   logoSrc?: string;
   address: string;
+  businessHours?: string;
+  lastOrder?: string;
+  closedDays?: string;
   kakaoChannelId: string;
   theme: {
     navy: string;
@@ -45,7 +48,10 @@ const storesByPublicCode: Record<string, StoreConfig> = {
     branchName: "청주점",
     tagline: "바다를 가장 맛있게 즐기는 방법",
     logoSrc: "/stores/fish-brothers/logo.png",
-    address: "충청북도 청주시 · 어시장브라더스",
+    address: "충북 청주시 흥덕구 직지대로 551 A동 1층 116~120호",
+    businessHours: "11:00 – 23:00",
+    lastOrder: "22:00",
+    closedDays: "연중무휴",
     kakaoChannelId: "_fish_brothers",
     theme: {
       navy: "#071b2b",

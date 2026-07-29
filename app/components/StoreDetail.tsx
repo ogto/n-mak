@@ -186,9 +186,9 @@ export function StoreDetail({ store, section }: StoreDetailProps) {
             </DetailCard>
             <DetailCard>
               <dl className="store-details">
-                <div><dt>영업시간</dt><dd><b>오늘 영업중</b><span>16:00 – 24:00</span></dd></div>
-                <div><dt>라스트오더</dt><dd><span>23:00</span></dd></div>
-                <div><dt>휴무일</dt><dd><span>매주 월요일</span></dd></div>
+                <div><dt>영업시간</dt><dd><b>오늘 영업중</b><span>{store.businessHours ?? "16:00 – 24:00"}</span></dd></div>
+                <div><dt>라스트오더</dt><dd><span>{store.lastOrder ?? "23:00"}</span></dd></div>
+                <div><dt>휴무일</dt><dd><span>{store.closedDays ?? "매주 월요일"}</span></dd></div>
                 <div><dt>편의정보</dt><dd><span>단체석 · 포장 · 주차</span></dd></div>
               </dl>
             </DetailCard>
