@@ -19,9 +19,7 @@ type StorefrontProps = {
 
 export function Storefront({ store }: StorefrontProps) {
   const router = useRouter();
-  const [gameOpen, setGameOpen] = useState(false);
   const [promoOpen, setPromoOpen] = useState(false);
-  const [won, setWon] = useState(false);
   const [toast, setToast] = useState("");
 
   useEffect(() => {
@@ -45,16 +43,6 @@ export function Storefront({ store }: StorefrontProps) {
   const notify = (message: string, duration = 1800) => {
     setToast(message);
     window.setTimeout(() => setToast(""), duration);
-  };
-
-  const playGame = () => {
-    setGameOpen(true);
-    setWon(false);
-  };
-
-  const saveCoupon = () => {
-    setGameOpen(false);
-    notify("쿠폰함에 저장했어요!", 2200);
   };
 
   const closePromo = () => {
@@ -93,7 +81,7 @@ export function Storefront({ store }: StorefrontProps) {
             <p>오늘 매장을 방문한 고객님만을 위한 특별한 혜택이에요.</p>
           </div>
 
-          <button className="game-card" onClick={playGame}>
+          <button className="game-card" onClick={() => router.push(`/s/${store.publicCode}/game`)}>
             {store.game.artSrc ? (
               <img className="game-art" src={store.game.artSrc} alt="" aria-hidden="true" />
             ) : null}
@@ -175,43 +163,6 @@ export function Storefront({ store }: StorefrontProps) {
               <p>전복과 아삭한 채소를 푸짐하게 담은 냉 비빔물국수를 만나보세요.</p>
               <button className="primary-button" onClick={closePromo}>확인</button>
             </div>
-          </section>
-        </div>
-      )}
-
-      {gameOpen && (
-        <div className="modal-backdrop" role="presentation" onMouseDown={() => setGameOpen(false)}>
-          <section
-            className="game-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-label={store.game.title.replace("\n", " ")}
-            onMouseDown={(event) => event.stopPropagation()}
-          >
-            <button className="modal-close" onClick={() => setGameOpen(false)} aria-label="닫기">×</button>
-            {!won ? (
-              <>
-                <span className="modal-eyebrow">{store.game.eyebrow}</span>
-                <h2>오늘의 행운은<br />어떤 물고기일까요?</h2>
-                <div className="catch-scene" aria-hidden="true">
-                  <span className="hook">J</span>
-                  <span className="caught-fish">◆</span>
-                </div>
-                <p>화면을 눌러 행운을 낚아보세요!</p>
-                <button className="primary-button" onClick={() => setWon(true)}>지금 낚기</button>
-              </>
-            ) : (
-              <>
-                <span className="modal-eyebrow">CONGRATULATIONS!</span>
-                <h2>신선한 행운을<br />낚았어요!</h2>
-                <div className="prize">
-                  <span>오늘의 당첨 쿠폰</span>
-                  <b>{store.game.prize}</b>
-                  <small>오늘부터 7일간 사용 가능</small>
-                </div>
-                <button className="primary-button" onClick={saveCoupon}>쿠폰함에 저장하기</button>
-              </>
-            )}
           </section>
         </div>
       )}

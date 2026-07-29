@@ -1154,6 +1154,620 @@ button {
   transform: translateX(-50%);
 }
 
+.fishing-shell {
+  min-height: 100dvh;
+  padding-bottom: 48px;
+  color: white;
+  background:
+    radial-gradient(circle at 82% 8%, rgba(99,214,232,.2), transparent 24%),
+    linear-gradient(180deg, #061d2d 0%, #0a3f59 46%, #f3f5f0 46%);
+}
+
+.fishing-header {
+  width: min(100%, 760px);
+  display: grid;
+  grid-template-columns: 50px 1fr auto;
+  align-items: center;
+  gap: 13px;
+  margin-inline: auto;
+  padding: max(20px, env(safe-area-inset-top)) 20px 10px;
+}
+
+.fishing-header > button {
+  width: 48px;
+  height: 48px;
+  color: white;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 50%;
+  background: rgba(255,255,255,.09);
+  font-size: 24px;
+}
+
+.fishing-header > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.fishing-header strong {
+  font-size: 16px;
+  letter-spacing: -.04em;
+}
+
+.fishing-header div span {
+  overflow: hidden;
+  color: rgba(255,255,255,.55);
+  font-size: 10px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.game-attempt {
+  padding: 7px 10px;
+  color: var(--aqua);
+  border: 1px solid rgba(99,214,232,.22);
+  border-radius: 999px;
+  background: rgba(99,214,232,.08);
+  font-size: 10px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.fishing-copy {
+  width: min(100%, 760px);
+  min-height: 158px;
+  margin-inline: auto;
+  padding: 27px 22px 22px;
+}
+
+.fishing-copy > span {
+  color: var(--aqua);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .16em;
+}
+
+.fishing-copy h1 {
+  margin: 7px 0 6px;
+  font-size: clamp(28px, 8.5vw, 42px);
+  line-height: 1.05;
+  letter-spacing: -.065em;
+}
+
+.fishing-copy p {
+  margin: 0;
+  color: rgba(255,255,255,.58);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.fishing-stage {
+  position: relative;
+  width: calc(100% - 32px);
+  max-width: 720px;
+  height: min(46dvh, 390px);
+  min-height: 330px;
+  display: block;
+  margin: 0 auto;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 30px;
+  background: linear-gradient(180deg, #94e3dc 0 51%, #1978a1 52% 100%);
+  box-shadow: 0 22px 55px rgba(0,16,30,.28);
+  touch-action: manipulation;
+}
+
+.fishing-stage:disabled {
+  cursor: default;
+  opacity: 1;
+}
+
+.game-sun {
+  position: absolute;
+  width: 66px;
+  height: 66px;
+  top: 28px;
+  right: 28px;
+  border-radius: 50%;
+  background: rgba(255,249,198,.78);
+  box-shadow: 0 0 30px rgba(255,244,174,.4);
+}
+
+.game-cloud {
+  position: absolute;
+  width: 75px;
+  height: 20px;
+  top: 76px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.52);
+}
+
+.game-cloud::before,
+.game-cloud::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  border-radius: 50%;
+  background: inherit;
+}
+
+.game-cloud::before { width: 32px; height: 32px; left: 12px; }
+.game-cloud::after { width: 24px; height: 24px; right: 10px; }
+.cloud-one { left: 26px; animation: cloudDrift 7s ease-in-out infinite alternate; }
+.cloud-two { top: 126px; right: 74px; transform: scale(.68); opacity: .7; animation: cloudDrift 9s ease-in-out infinite alternate-reverse; }
+
+@keyframes cloudDrift {
+  to { transform: translateX(20px); }
+}
+
+.game-boat {
+  position: absolute;
+  z-index: 5;
+  width: 126px;
+  height: 38px;
+  left: 24px;
+  top: 45%;
+  border-radius: 4px 5px 58px 26px;
+  background: linear-gradient(180deg, #fff 0 20%, #ff795f 22% 100%);
+  box-shadow: 0 12px 16px rgba(4,44,65,.22);
+  transform: rotate(2deg);
+  animation: boatFloat 2.8s ease-in-out infinite;
+}
+
+.game-boat::before {
+  content: "";
+  position: absolute;
+  width: 58px;
+  height: 32px;
+  left: 25px;
+  top: -27px;
+  border: 4px solid #f1f5ec;
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
+  background: #e7f2ee;
+  box-shadow: inset 15px 0 #155d81, inset -15px 0 #155d81;
+}
+
+.game-boat::after {
+  content: "";
+  position: absolute;
+  width: 4px;
+  height: 49px;
+  left: 53px;
+  top: -72px;
+  border-radius: 4px;
+  background: #f6f1df;
+  box-shadow: 13px 11px 0 -1px #ff765f;
+}
+
+.game-boat i {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  right: 22px;
+  top: 10px;
+  border: 3px solid white;
+  border-radius: 50%;
+  background: #ff765f;
+}
+
+@keyframes boatFloat {
+  50% { transform: translateY(5px) rotate(-1deg); }
+}
+
+.fishing-rod {
+  position: absolute;
+  z-index: 6;
+  width: 105px;
+  height: 4px;
+  left: 104px;
+  top: calc(45% - 31px);
+  border-radius: 999px;
+  background: #263c41;
+  transform: rotate(-23deg);
+  transform-origin: left center;
+  transition: transform .5s ease;
+}
+
+.fishing-line {
+  position: absolute;
+  z-index: 4;
+  width: 1px;
+  height: 122px;
+  left: 198px;
+  top: calc(45% - 68px);
+  border-left: 2px solid rgba(18,40,47,.76);
+  transform-origin: top;
+  transition: height .5s ease, transform .5s ease;
+}
+
+.fishing-line i {
+  position: absolute;
+  width: 12px;
+  height: 15px;
+  right: -7px;
+  bottom: -11px;
+  border-right: 3px solid #263c41;
+  border-bottom: 3px solid #263c41;
+  border-radius: 0 0 9px 0;
+}
+
+.phase-ready .fishing-line {
+  height: 26px;
+  transform: translate(-62px, 11px);
+}
+
+.phase-ready .fishing-rod {
+  transform: rotate(-37deg);
+}
+
+.phase-casting .fishing-rod {
+  animation: rodCast .8s ease-out;
+}
+
+.phase-casting .fishing-line {
+  animation: lineCast .85s ease-out;
+}
+
+@keyframes rodCast {
+  0% { transform: rotate(-42deg); }
+  45% { transform: rotate(12deg); }
+  100% { transform: rotate(-23deg); }
+}
+
+@keyframes lineCast {
+  0% { height: 18px; transform: translate(-70px, 10px); }
+  55% { height: 50px; transform: translate(98px, 14px) rotate(-18deg); }
+  100% { height: 122px; transform: translate(0); }
+}
+
+.phase-catching .fishing-rod {
+  transform: rotate(-47deg);
+}
+
+.phase-catching .fishing-line {
+  height: 45px;
+  transform: translate(-28px, -5px);
+}
+
+.ocean-wave {
+  position: absolute;
+  right: -12%;
+  bottom: -18%;
+  left: -12%;
+  height: 57%;
+  border-radius: 48% 52% 0 0;
+}
+
+.wave-back {
+  z-index: 2;
+  bottom: -8%;
+  background: #1d76aa;
+  transform: rotate(-3deg);
+  animation: oceanMove 3.2s ease-in-out infinite alternate;
+}
+
+.wave-front {
+  z-index: 7;
+  bottom: -25%;
+  background: #075071;
+  transform: rotate(4deg);
+  animation: oceanMove 2.5s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes oceanMove {
+  to { transform: translateY(9px) rotate(2deg); }
+}
+
+.stage-action {
+  position: absolute;
+  z-index: 12;
+  right: 20px;
+  bottom: 20px;
+  left: 20px;
+  min-height: 48px;
+  display: grid;
+  place-content: center;
+  padding: 12px;
+  color: white;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 16px;
+  background: rgba(4,32,48,.82);
+  backdrop-filter: blur(8px);
+  font-size: 14px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.phase-ready .stage-action,
+.phase-timing .stage-action {
+  animation: actionPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes actionPulse {
+  50% { transform: scale(.98); background: rgba(13,91,113,.9); }
+}
+
+.game-caught-fish {
+  position: absolute;
+  z-index: 9;
+  width: 72px;
+  height: 42px;
+  left: 49%;
+  top: 60%;
+  border-radius: 65% 42% 42% 65%;
+  background: linear-gradient(135deg, #ff947c, #e65750);
+  box-shadow: 0 10px 15px rgba(2,35,53,.18);
+  animation: fishRise 1.5s cubic-bezier(.18,.78,.24,1) forwards;
+}
+
+.game-caught-fish::before {
+  content: "";
+  position: absolute;
+  right: -23px;
+  top: 7px;
+  border-top: 14px solid transparent;
+  border-bottom: 14px solid transparent;
+  border-left: 25px solid #e65750;
+}
+
+.game-caught-fish::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  top: 10px;
+  left: 15px;
+  border-radius: 50%;
+  background: #06293a;
+  box-shadow: 1px 1px 0 2px white;
+}
+
+.game-caught-fish i {
+  position: absolute;
+  width: 23px;
+  height: 12px;
+  left: 26px;
+  top: -7px;
+  border-radius: 100% 0;
+  background: #ffb09a;
+  transform: rotate(-18deg);
+}
+
+.game-caught-fish.golden {
+  background: linear-gradient(135deg, #fff7a9 0%, #ffd12e 38%, #e99600 100%);
+  box-shadow:
+    0 0 14px #fff6a3,
+    0 0 32px #ffd83d,
+    0 0 56px rgba(255,208,28,.85);
+  animation: goldenFishRise 1.5s cubic-bezier(.18,.78,.24,1) forwards;
+}
+
+.game-caught-fish.golden::before {
+  border-left-color: #e9a500;
+}
+
+.game-caught-fish.golden i {
+  background: #fff5a0;
+}
+
+@keyframes fishRise {
+  0% { transform: translateY(90px) rotate(-16deg) scale(.7); opacity: 0; }
+  35% { opacity: 1; }
+  70% { transform: translate(-45px,-115px) rotate(18deg) scale(1.15); }
+  100% { transform: translate(-70px,-145px) rotate(-8deg) scale(1); }
+}
+
+@keyframes goldenFishRise {
+  0% { transform: translateY(90px) rotate(-16deg) scale(.6); opacity: 0; filter: brightness(1); }
+  35% { opacity: 1; filter: brightness(1.8); }
+  70% { transform: translate(-45px,-115px) rotate(18deg) scale(1.35); filter: brightness(1.25); }
+  100% { transform: translate(-70px,-145px) rotate(-8deg) scale(1.08); filter: brightness(1.1); }
+}
+
+.miss-splash {
+  position: absolute;
+  z-index: 9;
+  left: 55%;
+  top: 57%;
+  color: rgba(255,255,255,.88);
+  font-size: 78px;
+  font-weight: 200;
+  animation: splashOut .9s ease-out both;
+}
+
+@keyframes splashOut {
+  from { transform: scale(.3); opacity: 0; }
+  50% { opacity: 1; }
+  to { transform: scale(1.5); opacity: 0; }
+}
+
+.fishing-gauge,
+.game-result,
+.reward-guide {
+  width: calc(100% - 32px);
+  max-width: 720px;
+  margin: 16px auto 0;
+  padding: 20px;
+  border: 1px solid rgba(8,47,66,.08);
+  border-radius: 24px;
+  color: var(--ink);
+  background: rgba(255,255,255,.97);
+  box-shadow: 0 14px 35px rgba(6,40,55,.1);
+}
+
+.gauge-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 13px;
+}
+
+.gauge-label strong {
+  color: var(--blue);
+  font-size: 10px;
+  letter-spacing: .12em;
+}
+
+.gauge-label span {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.gauge-track {
+  position: relative;
+  height: 22px;
+  border: 5px solid #e4eaeb;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ff8a73, #ffd879 30%, #9ae0b7 50%, #ffd879 70%, #ff8a73);
+}
+
+.gauge-success {
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  left: 34%;
+  width: 32%;
+  border: 2px solid rgba(255,255,255,.9);
+  border-radius: 999px;
+  box-shadow: 0 0 15px rgba(77,200,138,.45);
+}
+
+.gauge-needle {
+  position: absolute;
+  width: 6px;
+  height: 34px;
+  top: 50%;
+  left: var(--gauge-position);
+  border: 2px solid white;
+  border-radius: 999px;
+  background: var(--navy);
+  box-shadow: 0 4px 9px rgba(0,0,0,.2);
+  transform: translate(-50%,-50%);
+}
+
+.game-result {
+  text-align: center;
+}
+
+.game-result > span {
+  color: var(--coral);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .14em;
+}
+
+.game-result h2 {
+  margin: 7px 0 5px;
+  font-size: 28px;
+  line-height: 1.1;
+  letter-spacing: -.06em;
+}
+
+.game-result p {
+  margin: 0 0 17px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.game-result button {
+  width: 100%;
+  min-height: 52px;
+  padding: 13px;
+  color: white;
+  border-radius: 14px;
+  background: var(--navy);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.game-result button:disabled {
+  background: #6f8f91;
+}
+
+.game-result .game-retry {
+  margin-top: 8px;
+  color: var(--navy);
+  background: #e9efed;
+}
+
+.golden-result {
+  border-color: rgba(223,165,0,.42);
+  background:
+    radial-gradient(circle at 50% 0, rgba(255,222,82,.32), transparent 40%),
+    #fffdf1;
+  box-shadow: 0 12px 42px rgba(212,157,0,.2);
+}
+
+.golden-result > span,
+.golden-result h2 {
+  color: #b77800;
+}
+
+.reward-guide {
+  margin-top: 20px;
+}
+
+.reward-guide > div span {
+  color: var(--blue);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .14em;
+}
+
+.reward-guide h2 {
+  margin: 4px 0 15px;
+  font-size: 21px;
+  letter-spacing: -.05em;
+}
+
+.reward-guide ul {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.reward-guide li {
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 0;
+  border-bottom: 1px solid #edf1ef;
+}
+
+.reward-guide li:last-child {
+  border: 0;
+}
+
+.reward-guide li > span {
+  color: var(--aqua);
+  font-size: 10px;
+}
+
+.reward-guide li strong {
+  font-size: 13px;
+}
+
+.reward-guide li b {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.reward-guide li.rare {
+  color: #b77800;
+}
+
+.reward-guide li.rare > span {
+  color: #f2b900;
+  font-size: 15px;
+  filter: drop-shadow(0 0 5px rgba(242,185,0,.5));
+}
+
 .detail-shell {
   background:
     linear-gradient(180deg, var(--navy) 0 300px, var(--cream) 300px 100%);
