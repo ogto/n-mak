@@ -546,7 +546,7 @@ button {
   transform: rotate(-45deg);
 }
 
-.menu-icon.coupon {
+.menu-icon.ticket {
   width: 38px;
   height: 28px;
   margin-top: 3px;
@@ -554,7 +554,7 @@ button {
   border-radius: 8px;
 }
 
-.menu-icon.coupon::before {
+.menu-icon.ticket::before {
   content: "";
   position: absolute;
   top: 3px;
@@ -563,7 +563,7 @@ button {
   border-left: 2px dashed currentColor;
 }
 
-.menu-icon.coupon::after {
+.menu-icon.ticket::after {
   content: "%";
   position: absolute;
   top: 2px;

@@ -6,7 +6,7 @@ import type { StoreConfig } from "../../lib/stores";
 
 const quickMenus = [
   { icon: "attendance", label: "출석체크", detail: "오늘 +100P", tone: "mint" },
-  { icon: "coupon", label: "내 쿠폰", detail: "3장 보유", tone: "coral", target: "coupons" },
+  { icon: "ticket", label: "내 쿠폰", detail: "3장 보유", tone: "coral", target: "coupons" },
   { icon: "points", label: "포인트", detail: "2,450P", tone: "blue" },
   { icon: "store", label: "매장정보", detail: "영업중", tone: "sand" },
 ];
