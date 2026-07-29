@@ -121,7 +121,7 @@ export function FishingGame({ store }: FishingGameProps) {
   };
 
   return (
-    <main className="app-shell fishing-shell" style={theme}>
+    <main className={`app-shell fishing-shell game-${phase}`} style={theme}>
       <header className="fishing-header">
         <button onClick={() => router.push(`/s/${store.publicCode}`)} aria-label="홈으로 돌아가기">←</button>
         <div><strong>행운의 대어잡기</strong><span>{store.displayName} {store.branchName}</span></div>
@@ -143,11 +143,15 @@ export function FishingGame({ store }: FishingGameProps) {
         <span className="game-sun" aria-hidden="true" />
         <span className="game-cloud cloud-one" aria-hidden="true" />
         <span className="game-cloud cloud-two" aria-hidden="true" />
+        <span className="distant-island" aria-hidden="true" />
         <span className="fishing-rod" aria-hidden="true" />
         <span className="fishing-line" aria-hidden="true"><i /></span>
         <span className="game-boat" aria-hidden="true"><i /></span>
+        <span className="boat-wake" aria-hidden="true" />
         <span className="ocean-wave wave-back" aria-hidden="true" />
         <span className="ocean-wave wave-front" aria-hidden="true" />
+        <span className="sea-bubbles bubbles-one" aria-hidden="true"><i /></span>
+        <span className="sea-bubbles bubbles-two" aria-hidden="true"><i /></span>
         {(phase === "catching" || phase === "result") && (
           <span className={`game-caught-fish ${reward?.golden ? "golden" : ""}`} aria-hidden="true"><i /></span>
         )}
@@ -191,18 +195,6 @@ export function FishingGame({ store }: FishingGameProps) {
         </section>
       )}
 
-      <section className="reward-guide">
-        <div><span>PRIZE LIST</span><h2>잡을 수 있는 행운</h2></div>
-        <ul>
-          {rewards.map((item) => (
-            <li className={item.golden ? "rare" : ""} key={item.name}>
-              <span>{item.golden ? "★" : "●"}</span>
-              <strong>{item.name}</strong>
-              <b>{item.probability}%</b>
-            </li>
-          ))}
-        </ul>
-      </section>
     </main>
   );
 }
