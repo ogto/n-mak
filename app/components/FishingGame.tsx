@@ -63,7 +63,7 @@ export function FishingGame({ store }: FishingGameProps) {
 
     const timer = window.setTimeout(
       () => setPhase(phase === "casting" ? "timing" : "result"),
-      phase === "casting" ? 900 : 1600,
+      phase === "casting" ? 1000 : 2000,
     );
 
     return () => window.clearTimeout(timer);
@@ -90,6 +90,7 @@ export function FishingGame({ store }: FishingGameProps) {
       setReward(null);
       setClaimed(false);
       setGauge(0);
+      window.navigator.vibrate?.(15);
       setPhase("casting");
       return;
     }
@@ -97,8 +98,10 @@ export function FishingGame({ store }: FishingGameProps) {
     if (phase === "timing") {
       if (gauge >= 34 && gauge <= 66) {
         setReward(drawReward());
+        window.navigator.vibrate?.([35, 30, 70]);
         setPhase("catching");
       } else {
+        window.navigator.vibrate?.(20);
         setPhase("miss");
       }
     }
@@ -138,21 +141,26 @@ export function FishingGame({ store }: FishingGameProps) {
         <span className="game-cloud cloud-one" aria-hidden="true" />
         <span className="game-cloud cloud-two" aria-hidden="true" />
         <span className="distant-island" aria-hidden="true" />
-        <span className="fishing-rod" aria-hidden="true" />
+        <span className="fishing-rod" aria-hidden="true"><i className="rod-flex" /></span>
         <span className="fishing-line" aria-hidden="true">
+          <span className="line-cast-arc" />
           <b className="line-float" />
           <em className="line-sinker" />
-          <i />
+          <i className="line-hook" />
+          <span className="hook-splash" />
+          {(phase === "catching" || phase === "result") && (
+            <span className={`game-caught-fish ${reward?.golden ? "golden" : ""}`}>
+              <i />
+            </span>
+          )}
         </span>
+        <span className="cast-splash" aria-hidden="true" />
         <span className="game-boat" aria-hidden="true"><i /></span>
         <span className="boat-wake" aria-hidden="true" />
         <span className="ocean-wave wave-back" aria-hidden="true" />
         <span className="ocean-wave wave-front" aria-hidden="true" />
         <span className="sea-bubbles bubbles-one" aria-hidden="true"><i /></span>
         <span className="sea-bubbles bubbles-two" aria-hidden="true"><i /></span>
-        {(phase === "catching" || phase === "result") && (
-          <span className={`game-caught-fish ${reward?.golden ? "golden" : ""}`} aria-hidden="true"><i /></span>
-        )}
         {phase === "miss" && <span className="miss-splash" aria-hidden="true">⌁</span>}
 
         <button
