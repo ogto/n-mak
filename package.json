@@ -13,9 +13,13 @@
     "start": "vinext start",
     "test": "npm run build && node --test tests/rendered-html.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
-    "db:generate": "drizzle-kit generate"
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "node --env-file=.env.local ./node_modules/drizzle-kit/bin.cjs migrate",
+    "db:seed": "node --env-file=.env.local scripts/seed-db.mjs",
+    "db:verify": "node --env-file=.env.local scripts/verify-db.mjs"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
     "drizzle-orm": "0.45.2",
     "next": "16.2.6",
     "react": "19.2.6",
