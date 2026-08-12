@@ -1165,8 +1165,8 @@ button {
 .fishing-shell {
   width: 100%;
   max-width: none;
-  height: 100dvh;
-  min-height: 0;
+  height: 100svh;
+  min-height: 100svh;
   max-height: 100dvh;
   display: block;
   overflow: hidden;
@@ -1187,7 +1187,7 @@ button {
   grid-template-columns: 50px 1fr auto;
   align-items: center;
   gap: 13px;
-  padding: max(16px, env(safe-area-inset-top)) 18px 8px;
+  padding: max(14px, calc(env(safe-area-inset-top) + 6px)) 16px 12px;
   color: white;
   background: linear-gradient(180deg, rgba(3,26,40,.9) 0%, rgba(3,26,40,.48) 76%, transparent 100%);
   text-shadow: 0 2px 8px rgba(0,18,30,.7);
@@ -1239,7 +1239,7 @@ button {
 .fishing-copy {
   position: absolute;
   z-index: 25;
-  top: max(88px, calc(env(safe-area-inset-top) + 76px));
+  top: max(84px, calc(env(safe-area-inset-top) + 76px));
   right: 0;
   left: 0;
   padding: 12px 22px;
@@ -1264,7 +1264,67 @@ button {
   line-height: 1.5;
 }
 
+.game-steps {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: max-content;
+  margin-top: 13px;
+  padding: 6px 8px;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 999px;
+  background: rgba(3,37,52,.34);
+  backdrop-filter: blur(7px);
+}
+
+.game-steps span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: rgba(255,255,255,.7);
+  font-size: 11px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.game-steps span b {
+  width: 21px;
+  height: 21px;
+  display: grid;
+  place-content: center;
+  border: 1px solid rgba(255,255,255,.28);
+  border-radius: 50%;
+  font-size: 10px;
+}
+
+.game-steps span.active,
+.game-steps span.done {
+  color: white;
+}
+
+.game-steps span.active b {
+  color: #063448;
+  border-color: #8afff5;
+  background: #8afff5;
+  box-shadow: 0 0 0 4px rgba(138,255,245,.13);
+}
+
+.game-steps span.done b {
+  color: #063448;
+  background: rgba(255,255,255,.82);
+}
+
+.game-steps > i {
+  width: 18px;
+  height: 1px;
+  background: rgba(255,255,255,.28);
+}
+
 .fishing-stage {
+  --boat-left: clamp(20px, 6vw, 72px);
+  --rod-left: calc(var(--boat-left) + clamp(80px, 18vw, 116px));
+  --line-left: calc(var(--rod-left) + clamp(96px, 16vw, 126px));
+  --horizon: 48%;
   position: relative;
   width: 100%;
   max-width: none;
@@ -1278,7 +1338,7 @@ button {
   border-radius: 0;
   background:
     radial-gradient(circle at 82% 16%, rgba(255,250,191,.38), transparent 17%),
-    linear-gradient(180deg, #8de1db 0 49%, #2785ad 50% 100%);
+    linear-gradient(180deg, #8de1db 0 calc(var(--horizon) - 1%), #2785ad var(--horizon) 100%);
   box-shadow: none;
   touch-action: manipulation;
 }
@@ -1290,7 +1350,7 @@ button {
   width: 180px;
   height: 42px;
   right: -30px;
-  top: calc(49% - 30px);
+  top: calc(var(--horizon) - 30px);
   border-radius: 70% 0 0;
   background: rgba(26,112,119,.24);
   box-shadow: -115px 14px 0 -12px rgba(20,103,112,.18);
@@ -1336,7 +1396,7 @@ button {
   position: absolute;
   width: 66px;
   height: 66px;
-  top: 190px;
+  top: clamp(184px, 26vh, 230px);
   right: 28px;
   border-radius: 50%;
   background: rgba(255,249,198,.78);
@@ -1349,7 +1409,7 @@ button {
   position: absolute;
   width: 75px;
   height: 20px;
-  top: 196px;
+  top: clamp(192px, 27vh, 238px);
   border-radius: 999px;
   background: rgba(255,255,255,.52);
 }
@@ -1366,7 +1426,7 @@ button {
 .game-cloud::before { width: 32px; height: 32px; left: 12px; }
 .game-cloud::after { width: 24px; height: 24px; right: 10px; }
 .cloud-one { left: 26px; animation: cloudDrift 7s ease-in-out infinite alternate; }
-.cloud-two { top: 250px; right: 74px; transform: scale(.68); opacity: .7; animation: cloudDrift 9s ease-in-out infinite alternate-reverse; }
+.cloud-two { top: clamp(240px, 34vh, 300px); right: 74px; transform: scale(.68); opacity: .7; animation: cloudDrift 9s ease-in-out infinite alternate-reverse; }
 
 .distant-island {
   position: absolute;
@@ -1374,7 +1434,7 @@ button {
   width: 98px;
   height: 24px;
   right: 20px;
-  top: calc(49% - 12px);
+  top: calc(var(--horizon) - 12px);
   border-radius: 70% 45% 0 0;
   background: linear-gradient(180deg, rgba(42,130,116,.5), rgba(19,102,105,.25));
   box-shadow: -34px 12px 0 -8px rgba(33,116,111,.25);
@@ -1389,8 +1449,8 @@ button {
   z-index: 5;
   width: 126px;
   height: 38px;
-  left: 24px;
-  top: 45%;
+  left: var(--boat-left);
+  top: calc(var(--horizon) - 3%);
   border-radius: 4px 5px 58px 26px;
   background: linear-gradient(180deg, #fff 0 20%, #ff795f 22% 100%);
   box-shadow: 0 12px 16px rgba(4,44,65,.22);
@@ -1440,8 +1500,8 @@ button {
   z-index: 6;
   width: 145px;
   height: 12px;
-  left: 12px;
-  top: calc(45% + 34px);
+  left: calc(var(--boat-left) - 12px);
+  top: calc(var(--horizon) + 31px);
   border-top: 4px solid rgba(255,255,255,.72);
   border-radius: 50%;
   filter: drop-shadow(14px 8px 0 rgba(255,255,255,.32));
@@ -1461,8 +1521,8 @@ button {
   z-index: 6;
   width: 72px;
   height: 7px;
-  left: 104px;
-  top: calc(45% - 31px);
+  left: var(--rod-left);
+  top: calc(var(--horizon) - 34px);
   border-radius: 999px;
   background: linear-gradient(180deg, #334f54 0%, #142b31 72%, #0b2026 100%);
   filter: drop-shadow(0 2px 1px rgba(3,31,39,.24));
@@ -1528,9 +1588,9 @@ button {
   z-index: 4;
   width: 1px;
   height: 148px;
-  left: 204px;
-  top: calc(45% - 73px);
-  border-left: 2px solid rgba(8,35,44,.84);
+  left: var(--line-left);
+  top: calc(var(--horizon) - 76px);
+  border-left: 2.5px solid rgba(8,35,44,.9);
   filter: drop-shadow(1px 0 0 rgba(255,255,255,.18));
   transform-origin: top;
   transform: rotate(-48deg);
@@ -1540,12 +1600,12 @@ button {
 .line-cast-arc {
   position: absolute;
   display: none;
-  width: 176px;
+  width: clamp(138px, 38vw, 230px);
   height: 112px;
   left: -1px;
   top: -1px;
-  border-top: 2px solid rgba(8,35,44,.86);
-  border-right: 2px solid rgba(8,35,44,.72);
+  border-top: 2.5px solid rgba(8,35,44,.9);
+  border-right: 2.5px solid rgba(8,35,44,.76);
   border-radius: 0 100% 0 0;
   filter: drop-shadow(1px 0 rgba(255,255,255,.16));
   transform-origin: left top;
@@ -1624,6 +1684,49 @@ button {
   transform-origin: right center;
 }
 
+.hook-ripple {
+  position: absolute;
+  width: 44px;
+  height: 15px;
+  right: -22px;
+  bottom: -21px;
+  border: 2px solid rgba(230,255,255,.72);
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.phase-timing .hook-ripple {
+  animation: hookRipple 1.05s ease-out infinite;
+}
+
+.bite-alert {
+  position: absolute;
+  right: -27px;
+  bottom: 4px;
+  width: 25px;
+  height: 25px;
+  display: grid;
+  place-content: center;
+  color: #062c3e;
+  border: 2px solid white;
+  border-radius: 50%;
+  background: #8afff5;
+  box-shadow: 0 5px 16px rgba(0,34,49,.28), 0 0 0 6px rgba(138,255,245,.2);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 950;
+  animation: biteAlert .55s ease-in-out infinite alternate;
+}
+
+@keyframes hookRipple {
+  from { opacity: .85; transform: scale(.45); }
+  to { opacity: 0; transform: scale(1.8,.85); }
+}
+
+@keyframes biteAlert {
+  to { transform: translateY(-7px) scale(1.08); }
+}
+
 .phase-ready .fishing-line {
   height: 58px;
   transform: rotate(5deg);
@@ -1687,19 +1790,19 @@ button {
   }
   18% { opacity: 1; }
   50% {
-    width: 196px;
+    width: clamp(152px, 43vw, 270px);
     height: 132px;
     opacity: 1;
     transform: rotate(-20deg) scale(1);
   }
   76% {
-    width: 174px;
+    width: clamp(142px, 39vw, 245px);
     height: 118px;
     opacity: 1;
     transform: rotate(-7deg) scale(1);
   }
   100% {
-    width: 154px;
+    width: clamp(132px, 35vw, 220px);
     height: 106px;
     opacity: 0;
     transform: rotate(2deg) scale(.96);
@@ -1849,18 +1952,47 @@ button {
   right: 20px;
   bottom: max(20px, env(safe-area-inset-bottom));
   left: 20px;
-  min-height: 48px;
+  min-height: 62px;
   display: grid;
   place-content: center;
   padding: 12px;
   color: white;
   border: 1px solid rgba(255,255,255,.2);
-  border-radius: 16px;
-  background: rgba(4,32,48,.82);
-  backdrop-filter: blur(8px);
-  font-size: 14px;
+  border-radius: 20px;
+  background: rgba(4,32,48,.9);
+  box-shadow: 0 12px 30px rgba(0,29,43,.22);
+  backdrop-filter: blur(10px);
+  font-size: 15px;
   font-weight: 900;
   text-align: center;
+}
+
+.stage-action b,
+.stage-action small {
+  display: block;
+}
+
+.stage-action b {
+  font-size: 17px;
+  line-height: 1.2;
+}
+
+.stage-action small {
+  margin-top: 4px;
+  color: rgba(255,255,255,.72);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.phase-timing .stage-action {
+  color: #052d3f;
+  border-color: rgba(255,255,255,.82);
+  background: #8afff5;
+  box-shadow: 0 12px 32px rgba(28,190,178,.32), 0 0 0 5px rgba(138,255,245,.16);
+}
+
+.phase-timing .stage-action small {
+  color: rgba(5,45,63,.66);
 }
 
 .phase-ready .stage-action,
@@ -1874,7 +2006,7 @@ button {
 }
 
 @keyframes actionPulse {
-  50% { transform: scale(.98); background: rgba(13,91,113,.9); }
+  50% { transform: scale(.975); box-shadow: 0 8px 22px rgba(0,29,43,.16); }
 }
 
 .cast-splash {
@@ -1882,8 +2014,8 @@ button {
   z-index: 9;
   width: 52px;
   height: 18px;
-  left: 350px;
-  top: calc(45% + 30px);
+  left: min(calc(100% - 58px), calc(var(--line-left) + clamp(112px, 30vw, 210px)));
+  top: calc(var(--horizon) + 18px);
   display: none;
   border: 4px solid rgba(232,255,255,.86);
   border-top: 0;
@@ -1968,6 +2100,62 @@ button {
 
 .phase-catching .boat-wake {
   animation: wakeHooked .7s ease-out 2;
+}
+
+.fish-shadow {
+  position: absolute;
+  z-index: 6;
+  width: 74px;
+  height: 29px;
+  left: min(calc(100% - 104px), calc(var(--line-left) + 36px));
+  top: calc(var(--horizon) + 78px);
+  border-radius: 58% 45% 45% 58%;
+  background: rgba(3,70,93,.42);
+  filter: blur(.2px);
+  animation: fishApproach 1.05s ease-in-out infinite alternate;
+}
+
+.fish-shadow::before {
+  content: "";
+  position: absolute;
+  right: -20px;
+  top: 3px;
+  border-top: 12px solid transparent;
+  border-bottom: 12px solid transparent;
+  border-left: 22px solid rgba(3,70,93,.42);
+}
+
+.fish-shadow::after {
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  left: 13px;
+  top: 8px;
+  border-radius: 50%;
+  background: rgba(217,251,245,.72);
+}
+
+.fish-shadow i {
+  position: absolute;
+  width: 18px;
+  height: 8px;
+  left: 27px;
+  top: -5px;
+  border-radius: 100% 0;
+  background: rgba(3,70,93,.34);
+  transform: rotate(-15deg);
+}
+
+.phase-catching .fish-shadow {
+  opacity: 0;
+  transform: translate(-38px, -42px) scale(.75);
+  transition: opacity .2s, transform .42s ease-in;
+}
+
+@keyframes fishApproach {
+  from { transform: translate(-14px, 6px) rotate(-2deg); }
+  to { transform: translate(7px, -3px) rotate(3deg); }
 }
 
 @keyframes castSplash {
@@ -2120,7 +2308,7 @@ button {
   width: auto;
   max-width: 720px;
   margin: 0 auto;
-  padding: 16px 18px;
+  padding: 17px 18px;
   border: 1px solid rgba(8,47,66,.08);
   border-radius: 24px;
   color: var(--ink);
@@ -2129,46 +2317,52 @@ button {
 }
 
 .fishing-gauge {
-  bottom: max(88px, calc(env(safe-area-inset-bottom) + 76px));
+  bottom: max(104px, calc(env(safe-area-inset-bottom) + 91px));
   pointer-events: none;
 }
 
 .gauge-label {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 12px;
   margin-bottom: 10px;
+}
+
+.gauge-label strong {
+  color: #0a766b;
+  font-size: 12px;
+  font-weight: 950;
 }
 
 .gauge-label span {
   color: #536b76;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .gauge-track {
   position: relative;
-  height: 22px;
+  height: 26px;
   border: 5px solid #e4eaeb;
   border-radius: 999px;
-  background: linear-gradient(90deg, #ff8a73, #ffd879 30%, #9ae0b7 50%, #ffd879 70%, #ff8a73);
+  background: linear-gradient(90deg, #ff9b85 0 13%, #ffe08a 18%, #79dfa8 25% 75%, #ffe08a 82%, #ff9b85 87% 100%);
 }
 
 .gauge-success {
   position: absolute;
   top: -5px;
   bottom: -5px;
-  left: 34%;
-  width: 32%;
+  left: 18%;
+  width: 64%;
   border: 2px solid rgba(255,255,255,.9);
   border-radius: 999px;
-  box-shadow: 0 0 15px rgba(77,200,138,.45);
+  box-shadow: 0 0 18px rgba(48,201,128,.58), inset 0 0 0 2px rgba(255,255,255,.28);
 }
 
 .gauge-needle {
   position: absolute;
-  width: 6px;
-  height: 34px;
+  width: 7px;
+  height: 38px;
   top: 50%;
   left: var(--gauge-position);
   border: 2px solid white;
@@ -2180,13 +2374,34 @@ button {
 
 .game-result {
   z-index: 40;
-  bottom: max(18px, env(safe-area-inset-bottom));
+  bottom: max(14px, calc(env(safe-area-inset-bottom) + 8px));
+  padding: 20px 18px 18px;
   text-align: center;
+}
+
+.reward-catch-mark {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-content: center;
+  margin: -45px auto 10px;
+  color: white;
+  border: 4px solid white;
+  border-radius: 50%;
+  background: var(--coral);
+  box-shadow: 0 7px 20px rgba(4,45,62,.2);
+  font-size: 23px;
+  font-weight: 950;
+}
+
+.miss-mark {
+  color: var(--navy);
+  background: #dceceb;
 }
 
 .game-result h2 {
   margin: 2px 0 7px;
-  font-size: clamp(31px, 8vw, 38px);
+  font-size: clamp(32px, 9vw, 42px);
   font-weight: 950;
   line-height: 1.05;
   letter-spacing: -.065em;
@@ -2195,19 +2410,19 @@ button {
 .game-result p {
   margin: 0 0 15px;
   color: #526875;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 800;
   line-height: 1.45;
 }
 
 .game-result button {
   width: 100%;
-  min-height: 44px;
+  min-height: 52px;
   padding: 10px;
   color: white;
   border-radius: 14px;
   background: var(--navy);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 900;
 }
 
@@ -2928,6 +3143,46 @@ button {
     min-height: 160px;
     padding-inline: 8px;
   }
+
+  .fishing-header {
+    grid-template-columns: 44px 1fr auto;
+    gap: 9px;
+    padding-inline: 14px;
+  }
+
+  .fishing-header > button {
+    width: 42px;
+    height: 42px;
+    font-size: 21px;
+  }
+
+  .fishing-header strong {
+    font-size: 15px;
+  }
+
+  .game-attempt {
+    padding: 6px 8px;
+    font-size: 9px;
+  }
+
+  .fishing-copy {
+    padding-inline: 18px;
+  }
+
+  .fishing-copy h1 {
+    font-size: clamp(28px, 8.5vw, 35px);
+  }
+
+  .stage-action {
+    right: 16px;
+    left: 16px;
+  }
+
+  .fishing-gauge,
+  .game-result {
+    right: 12px;
+    left: 12px;
+  }
 }
 
 @media (max-height: 700px) {
@@ -2945,11 +3200,21 @@ button {
   }
 
   .fishing-copy {
+    top: max(74px, calc(env(safe-area-inset-top) + 66px));
     padding-block: 8px 9px;
   }
 
   .fishing-copy h1 {
     font-size: clamp(24px, 7vw, 32px);
+  }
+
+  .fishing-copy p {
+    font-size: 12px;
+  }
+
+  .game-steps {
+    margin-top: 8px;
+    padding-block: 5px;
   }
 
   .fishing-stage {
@@ -2962,7 +3227,46 @@ button {
   }
 
   .game-result p {
+    margin-bottom: 11px;
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  .game-result h2 {
+    font-size: clamp(27px, 7vw, 34px);
+  }
+
+  .game-result button {
+    min-height: 46px;
+  }
+
+  .reward-catch-mark {
+    width: 42px;
+    height: 42px;
+    margin-top: -34px;
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 350px) {
+  .fishing-header div span {
     display: none;
+  }
+
+  .fishing-copy h1 {
+    font-size: 27px;
+  }
+
+  .game-steps {
+    gap: 5px;
+  }
+
+  .game-steps span {
+    font-size: 10px;
+  }
+
+  .game-steps > i {
+    width: 10px;
   }
 }
 
