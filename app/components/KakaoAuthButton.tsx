@@ -33,6 +33,7 @@ type KakaoAuthButtonProps = {
   label?: string;
   className?: string;
   autoLogin?: boolean;
+  autoLoginKey?: string;
   hidden?: boolean;
   onError?: (message: string) => void;
 };
@@ -51,6 +52,7 @@ export function KakaoAuthButton({
   label = "카카오로 1초 로그인",
   className = "kakao-login-button",
   autoLogin = false,
+  autoLoginKey = "guest",
   hidden = false,
   onError,
 }: KakaoAuthButtonProps) {
@@ -94,13 +96,13 @@ export function KakaoAuthButton({
     if (!/KAKAOTALK/i.test(window.navigator.userAgent)) return;
     if (new URLSearchParams(window.location.search).has("auth")) return;
 
-    const guardKey = `kakaoSilentLogin:${storeCode}`;
+    const guardKey = `kakaoSilentLogin:${storeCode}:${autoLoginKey}`;
     if (window.sessionStorage.getItem(guardKey) === "1") return;
 
     window.sessionStorage.setItem(guardKey, "1");
     const timer = window.setTimeout(() => void startLogin(true), 0);
     return () => window.clearTimeout(timer);
-  }, [autoLogin, ready, startLogin, storeCode]);
+  }, [autoLogin, autoLoginKey, ready, startLogin, storeCode]);
 
   return (
     <>

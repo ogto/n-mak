@@ -81,7 +81,7 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
 
   const quickDetail = (section: (typeof quickMenus)[number]["section"]) => {
     if (section === "attendance") return member ? `방문 ${member.visitCount}회` : "오늘 +100P";
-    if (section === "coupons") return member ? "쿠폰 확인" : "로그인 필요";
+    if (section === "coupons") return member ? `${member.couponCount}장 보유` : "로그인 필요";
     if (section === "points") return member ? `${member.pointsBalance.toLocaleString()}P` : "0P부터 시작";
     return "영업중";
   };
@@ -96,13 +96,14 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
 
   return (
     <main className="app-shell" style={theme} data-store-code={store.publicCode}>
-      {!member && (
+      {(!member || !member.nickname) && (
         <KakaoAuthButton
           javascriptKey={kakao.javascriptKey}
           channelPublicId={kakao.channelPublicId}
           storeCode={store.publicCode}
           returnTo={returnTo}
           autoLogin
+          autoLoginKey={member ? "profile-refresh" : "guest"}
           hidden
           onError={notify}
         />
@@ -144,7 +145,10 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
             <p>오늘 매장을 방문한 고객님만을 위한 특별한 혜택이에요.</p>
           </div>
 
-          <button className="game-card" onClick={() => router.push(`/s/${store.publicCode}/game`)}>
+          <button
+            className="game-card"
+            onClick={() => member ? router.push(`/s/${store.publicCode}/game`) : setLoginOpen(true)}
+          >
             {store.game.artSrc ? (
               <Image
                 className="game-art"
@@ -171,6 +175,17 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
             <div>
               <span className="member-tier">{tierLabel(member.tier)}</span>
               <strong>{member.nickname ? `${member.nickname}님, 반가워요!` : "카카오 회원님, 반가워요!"}</strong>
+              {!member.nickname && (
+                <KakaoAuthButton
+                  javascriptKey={kakao.javascriptKey}
+                  channelPublicId={kakao.channelPublicId}
+                  storeCode={store.publicCode}
+                  returnTo={returnTo}
+                  label="카카오 이름 불러오기"
+                  className="member-name-button"
+                  onError={notify}
+                />
+              )}
             </div>
             <div className="points">
               <span>나의 포인트</span>
@@ -210,29 +225,6 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
           ))}
         </div>
 
-        <div className="tablet-grid">
-          <section className="channel-card" id="channel">
-            <div className="kakao-symbol" aria-hidden="true">talk</div>
-            <div>
-              <span>{store.displayName} 소식 받기</span>
-              <h2>친구만 받는<br />신선한 혜택</h2>
-              <p>신메뉴와 깜짝 쿠폰을 카카오톡으로 보내드려요.</p>
-            </div>
-            {member?.channelFriendStatus === "added" ? (
-              <button type="button" className="channel-added" disabled>채널 친구 추가 완료</button>
-            ) : (
-              <KakaoAuthButton
-                javascriptKey={kakao.javascriptKey}
-                channelPublicId={kakao.channelPublicId}
-                storeCode={store.publicCode}
-                returnTo={returnTo}
-                label={member ? "카카오톡 채널 추가" : "로그인하고 채널 추가"}
-                className="channel-login-button"
-                onError={notify}
-              />
-            )}
-          </section>
-        </div>
       </section>
 
       {promoOpen && (

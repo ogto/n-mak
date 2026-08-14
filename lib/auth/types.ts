@@ -7,6 +7,7 @@ export type MemberView = {
   pointsBalance: number;
   lifetimePoints: number;
   visitCount: number;
+  couponCount: number;
 };
 
 export type PublicKakaoConfig = {

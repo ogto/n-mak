@@ -3,7 +3,10 @@
 import type { CSSProperties, ReactNode } from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import type { MemberView, PublicKakaoConfig } from "../../lib/auth/types";
+import type { MembershipDetailView } from "../../lib/membership";
 import type { StoreConfig } from "../../lib/stores";
+import { KakaoAuthButton } from "./KakaoAuthButton";
 
 export type DetailSection = "attendance" | "coupons" | "points" | "store";
 
@@ -11,21 +14,21 @@ const detailMeta: Record<DetailSection, { eyebrow: string; title: string; descri
   attendance: {
     eyebrow: "DAILY CHECK-IN",
     title: "출석체크",
-    description: "매일 방문하고 포인트와 쿠폰을 받아보세요.",
+    description: "하루 한 번 출석하고 100P를 받아보세요.",
     icon: "attendance",
     tone: "mint",
   },
   coupons: {
     eyebrow: "MY COUPONS",
     title: "내 쿠폰함",
-    description: "사용할 수 있는 혜택을 한눈에 확인하세요.",
+    description: "게임과 이벤트로 받은 쿠폰을 확인하세요.",
     icon: "ticket",
     tone: "coral",
   },
   points: {
     eyebrow: "MY POINTS",
     title: "포인트",
-    description: "쌓고 사용한 포인트 내역을 확인하세요.",
+    description: "적립한 포인트와 이용 내역을 확인하세요.",
     icon: "points",
     tone: "blue",
   },
@@ -41,17 +44,63 @@ const detailMeta: Record<DetailSection, { eyebrow: string; title: string; descri
 type StoreDetailProps = {
   store: StoreConfig;
   section: DetailSection;
+  member: MemberView | null;
+  membership: MembershipDetailView | null;
+  kakao: PublicKakaoConfig;
+};
+
+type CheckinResponse = {
+  awarded?: boolean;
+  pointsBalance?: number;
+  visitCount?: number;
+  visitDate?: string;
+  error?: string;
 };
 
 function DetailCard({ children, className = "" }: { children: ReactNode; className?: string }) {
   return <section className={`detail-card ${className}`}>{children}</section>;
 }
 
-export function StoreDetail({ store, section }: StoreDetailProps) {
+function seoulDateKey(date = new Date()) {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
+}
+
+function recentSevenDays() {
+  const todayKey = seoulDateKey();
+  const base = new Date(`${todayKey}T00:00:00Z`);
+
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(base);
+    date.setUTCDate(base.getUTCDate() - (6 - index));
+    const key = date.toISOString().slice(0, 10);
+    return {
+      key,
+      day: String(date.getUTCDate()),
+      label: index === 6 ? "오늘" : ["일", "월", "화", "수", "목", "금", "토"][date.getUTCDay()],
+    };
+  });
+}
+
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    month: "long",
+    day: "numeric",
+  }).format(new Date(value));
+}
+
+export function StoreDetail({ store, section, member, membership, kakao }: StoreDetailProps) {
   const router = useRouter();
-  const [checkedIn, setCheckedIn] = useState(false);
+  const [data, setData] = useState(membership);
+  const [checkingIn, setCheckingIn] = useState(false);
   const [toast, setToast] = useState("");
   const meta = detailMeta[section];
+  const days = recentSevenDays();
   const theme = {
     "--navy": store.theme.navy,
     "--deep": store.theme.navy,
@@ -63,8 +112,65 @@ export function StoreDetail({ store, section }: StoreDetailProps) {
 
   const notify = (message: string) => {
     setToast(message);
-    window.setTimeout(() => setToast(""), 1800);
+    window.setTimeout(() => setToast(""), 2200);
   };
+
+  const checkIn = async () => {
+    if (!data || checkingIn || data.checkedInToday) return;
+    setCheckingIn(true);
+
+    try {
+      const response = await fetch("/api/membership/checkin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ storeCode: store.publicCode }),
+      });
+      const result = await response.json() as CheckinResponse;
+
+      if (!response.ok || typeof result.pointsBalance !== "number" || typeof result.visitCount !== "number") {
+        throw new Error(result.error ?? "출석 처리에 실패했습니다.");
+      }
+
+      const visitDate = result.visitDate ?? seoulDateKey();
+      setData((current) => current ? {
+        ...current,
+        pointsBalance: result.pointsBalance as number,
+        lifetimePoints: current.lifetimePoints + (result.awarded ? 100 : 0),
+        visitCount: result.visitCount as number,
+        checkedInToday: true,
+        checkinDates: current.checkinDates.includes(visitDate)
+          ? current.checkinDates
+          : [visitDate, ...current.checkinDates],
+        pointTransactions: result.awarded ? [{
+          id: `checkin-${visitDate}`,
+          amount: 100,
+          balanceAfter: result.pointsBalance as number,
+          description: "일일 출석체크",
+          createdAt: new Date().toISOString(),
+        }, ...current.pointTransactions] : current.pointTransactions,
+      } : current);
+      notify(result.awarded ? "출석 완료! 100P가 적립됐어요." : "오늘은 이미 출석했어요.");
+      router.refresh();
+    } catch (error) {
+      notify(error instanceof Error ? error.message : "출석 처리에 실패했습니다.");
+    } finally {
+      setCheckingIn(false);
+    }
+  };
+
+  const copyAddress = async () => {
+    try {
+      await navigator.clipboard.writeText(store.address);
+      notify("주소를 복사했어요.");
+    } catch {
+      notify(store.address);
+    }
+  };
+
+  const privateSection = section !== "store";
+  const checkinDateSet = new Set(data?.checkinDates ?? []);
+  const recentCheckinCount = days.filter((day) => checkinDateSet.has(day.key)).length;
+  const availableCoupons = data?.coupons.filter((coupon) => coupon.status === "available") ?? [];
 
   return (
     <main className="app-shell detail-shell" style={theme}>
@@ -90,87 +196,119 @@ export function StoreDetail({ store, section }: StoreDetailProps) {
       </section>
 
       <div className="detail-content">
-        {section === "attendance" && (
+        {privateSection && (!member || !data) && (
+          <DetailCard className="detail-login-card">
+            <span className="auth-bubble" aria-hidden="true">K</span>
+            <h2>카카오로 로그인해 주세요</h2>
+            <p>내 출석, 쿠폰, 포인트를 안전하게 불러올게요.</p>
+            <KakaoAuthButton
+              javascriptKey={kakao.javascriptKey}
+              channelPublicId={kakao.channelPublicId}
+              storeCode={store.publicCode}
+              returnTo={`/s/${store.publicCode}/${section}`}
+              onError={notify}
+            />
+          </DetailCard>
+        )}
+
+        {section === "attendance" && data && (
           <>
             <DetailCard className="attendance-card">
               <div className="detail-card-heading">
-                <div><span>7월 출석 현황</span><strong>이번 달 2일 출석</strong></div>
-                <b>2 / 7</b>
+                <div><span>최근 7일 출석 현황</span><strong>누적 방문 {data.visitCount}회</strong></div>
+                <b>{recentCheckinCount} / 7</b>
               </div>
               <div className="stamp-row">
-                {["23", "24", "25", "26", "27", "28", "오늘"].map((day, index) => (
-                  <div className={index < 2 || checkedIn && index === 6 ? "stamped" : ""} key={day}>
-                    <span>{index < 2 || checkedIn && index === 6 ? "✓" : day}</span>
-                    <small>{index === 6 ? "오늘" : `${day}일`}</small>
-                  </div>
-                ))}
+                {days.map((day) => {
+                  const stamped = checkinDateSet.has(day.key);
+                  return (
+                    <div className={stamped ? "stamped" : ""} key={day.key}>
+                      <span>{stamped ? "✓" : day.day}</span>
+                      <small>{day.label}</small>
+                    </div>
+                  );
+                })}
               </div>
               <button
                 className="detail-primary"
-                disabled={checkedIn}
-                onClick={() => {
-                  setCheckedIn(true);
-                  notify("출석 완료! 100P가 적립됐어요.");
-                }}
+                disabled={data.checkedInToday || checkingIn}
+                onClick={checkIn}
               >
-                {checkedIn ? "오늘 출석 완료" : "출석하고 100P 받기"}
+                {data.checkedInToday ? "오늘 출석 완료" : checkingIn ? "출석 처리 중…" : "출석하고 100P 받기"}
               </button>
             </DetailCard>
             <DetailCard className="reward-card">
-              <span className="mini-label">7 DAYS REWARD</span>
-              <h2>7일 출석하면<br />매운탕 무료 쿠폰</h2>
-              <div className="reward-progress"><span style={{ width: checkedIn ? "43%" : "29%" }} /></div>
-              <p>{checkedIn ? "4번" : "5번"} 더 출석하면 쿠폰을 받을 수 있어요.</p>
+              <span className="mini-label">MEMBERSHIP POINT</span>
+              <h2>출석할 때마다<br />100P가 바로 적립돼요</h2>
+              <div className="reward-progress"><span style={{ width: `${Math.max(8, recentCheckinCount / 7 * 100)}%` }} /></div>
+              <p>현재 사용 가능한 포인트는 {data.pointsBalance.toLocaleString()}P예요.</p>
             </DetailCard>
           </>
         )}
 
-        {section === "coupons" && (
+        {section === "coupons" && data && (
           <>
             <div className="detail-summary">
-              <span>사용 가능 쿠폰</span>
-              <strong>{store.coupons.length + 1}<small>장</small></strong>
-              <p>기간이 짧은 쿠폰부터 사용해 보세요.</p>
+              <span>사용 가능한 쿠폰</span>
+              <strong>{availableCoupons.length}<small>장</small></strong>
+              <p>게임과 매장 이벤트에서 받은 쿠폰이 여기에 저장돼요.</p>
             </div>
-            <div className="coupon-list detail-coupon-list">
-              {store.coupons.map((coupon, index) => (
-                <article className="coupon" key={coupon.title}>
-                  <div className={`coupon-badge ${coupon.color}`}>
-                    <b>{coupon.discount}</b><span>COUPON</span>
-                  </div>
-                  <div className="coupon-copy">
-                    <strong>{coupon.title}</strong><p>{coupon.description}</p>
-                    <span>{coupon.due} · D-{index ? 12 : 5}</span>
-                  </div>
-                  <button className="coupon-use" onClick={() => notify("직원에게 이 화면을 보여주세요.")}>사용</button>
-                </article>
-              ))}
-              <article className="coupon">
-                <div className="coupon-badge coral"><b>3천원</b><span>COUPON</span></div>
-                <div className="coupon-copy">
-                  <strong>카카오 친구 감사 할인</strong><p>3만원 이상 주문 시 사용 가능</p><span>2026.08.31까지 · D-33</span>
-                </div>
-                <button className="coupon-use" onClick={() => notify("직원에게 이 화면을 보여주세요.")}>사용</button>
-              </article>
-            </div>
+            {availableCoupons.length > 0 ? (
+              <div className="coupon-list detail-coupon-list">
+                {availableCoupons.map((coupon, index) => (
+                  <article className="coupon" key={coupon.id}>
+                    <div className={`coupon-badge ${index % 2 === 0 ? "navy" : "coral"}`}>
+                      <b>혜택</b><span>COUPON</span>
+                    </div>
+                    <div className="coupon-copy">
+                      <strong>{coupon.title}</strong>
+                      <p>{coupon.description ?? "매장에서 사용할 수 있는 멤버십 쿠폰"}</p>
+                      <span>{formatDate(coupon.expiresAt)}까지</span>
+                    </div>
+                    <button className="coupon-use" onClick={() => notify("직원에게 이 쿠폰 화면을 보여주세요.")}>사용</button>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <DetailCard className="detail-empty-card">
+                <span className="quick-icon coral"><span className="menu-icon ticket" aria-hidden="true" /></span>
+                <h2>아직 받은 쿠폰이 없어요</h2>
+                <p>낚시 게임에 참여하면 당첨 쿠폰이 자동으로 보관돼요.</p>
+                <button className="detail-primary" onClick={() => router.push(`/s/${store.publicCode}/game`)}>게임 하러 가기</button>
+              </DetailCard>
+            )}
           </>
         )}
 
-        {section === "points" && (
+        {section === "points" && data && (
           <>
             <div className="point-balance">
               <span>사용 가능한 포인트</span>
-              <strong>2,450<small>P</small></strong>
-              <div><span>이번 달 적립 <b>+300P</b></span><span>이번 달 사용 <b>-1,000P</b></span></div>
+              <strong>{data.pointsBalance.toLocaleString()}<small>P</small></strong>
+              <div>
+                <span>누적 적립 <b>+{data.lifetimePoints.toLocaleString()}P</b></span>
+                <span>누적 방문 <b>{data.visitCount}회</b></span>
+              </div>
             </div>
             <DetailCard>
-              <div className="list-heading"><h2>포인트 내역</h2><button onClick={() => notify("최근 3개월 내역이에요.")}>최근 3개월⌄</button></div>
-              <ul className="point-list">
-                <li><span><b>매장 방문 적립</b><small>7월 29일 · 청주점</small></span><strong className="plus">+100P</strong></li>
-                <li><span><b>모둠회 주문 적립</b><small>7월 21일 · 청주점</small></span><strong className="plus">+200P</strong></li>
-                <li><span><b>쿠폰 교환</b><small>7월 12일 · 포인트 사용</small></span><strong>-1,000P</strong></li>
-                <li><span><b>첫 친구 추가 적립</b><small>6월 30일 · 카카오 채널</small></span><strong className="plus">+500P</strong></li>
-              </ul>
+              <div className="list-heading"><h2>포인트 내역</h2><span>최근 30건</span></div>
+              {data.pointTransactions.length > 0 ? (
+                <ul className="point-list">
+                  {data.pointTransactions.map((transaction) => (
+                    <li key={transaction.id}>
+                      <span>
+                        <b>{transaction.description}</b>
+                        <small>{formatDate(transaction.createdAt)} · 잔액 {transaction.balanceAfter.toLocaleString()}P</small>
+                      </span>
+                      <strong className={transaction.amount > 0 ? "plus" : ""}>
+                        {transaction.amount > 0 ? "+" : ""}{transaction.amount.toLocaleString()}P
+                      </strong>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="detail-empty-inline">아직 포인트 내역이 없어요.</div>
+              )}
             </DetailCard>
           </>
         )}
@@ -181,21 +319,17 @@ export function StoreDetail({ store, section }: StoreDetailProps) {
               <div className="map-placeholder" aria-hidden="true"><span>어시장<br />브라더스</span><b>⌖</b></div>
               <div className="store-address">
                 <span>{store.branchName}</span><h2>{store.displayName}</h2><p>{store.address}</p>
-                <button onClick={() => notify("주소를 복사했어요.")}>주소 복사</button>
+                <button onClick={copyAddress}>주소 복사</button>
               </div>
             </DetailCard>
             <DetailCard>
               <dl className="store-details">
-                <div><dt>영업시간</dt><dd><b>오늘 영업중</b><span>{store.businessHours ?? "16:00 – 24:00"}</span></dd></div>
-                <div><dt>라스트오더</dt><dd><span>{store.lastOrder ?? "23:00"}</span></dd></div>
-                <div><dt>휴무일</dt><dd><span>{store.closedDays ?? "매주 월요일"}</span></dd></div>
+                <div><dt>영업시간</dt><dd><b>오늘 영업중</b><span>{store.businessHours ?? "11:00 – 23:00"}</span></dd></div>
+                <div><dt>라스트오더</dt><dd><span>{store.lastOrder ?? "22:00"}</span></dd></div>
+                <div><dt>휴무일</dt><dd><span>{store.closedDays ?? "연중무휴"}</span></dd></div>
                 <div><dt>편의정보</dt><dd><span>단체석 · 포장 · 주차</span></dd></div>
               </dl>
             </DetailCard>
-            <div className="store-actions">
-              <button onClick={() => notify("전화 연결 기능을 준비 중이에요.")}>전화하기</button>
-              <button onClick={() => notify("지도 앱 연결 기능을 준비 중이에요.")}>길찾기</button>
-            </div>
           </>
         )}
       </div>

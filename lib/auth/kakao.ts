@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { getDb } from "../../db";
+import { getDb, getSql } from "../../db";
 import { members, storeMemberships, stores } from "../../db/schema";
 
 type KakaoTokenResponse = {
@@ -11,6 +11,8 @@ type KakaoTokenResponse = {
 type KakaoUserResponse = {
   id: number;
   kakao_account?: {
+    name?: string;
+    legal_name?: string;
     profile?: {
       nickname?: string;
       profile_image_url?: string;
@@ -72,6 +74,7 @@ export async function getKakaoChannelFriendStatus(accessToken: string, channelPu
   try {
     const url = new URL("https://kapi.kakao.com/v2/api/talk/channels");
     url.searchParams.set("channel_ids", channelPublicId);
+    url.searchParams.set("channel_id_type", "channel_public_id");
     const response = await fetch(url, {
       headers: { Authorization: `Bearer ${accessToken}` },
       cache: "no-store",
@@ -109,12 +112,14 @@ export async function upsertKakaoMember(input: {
 
   const now = new Date();
   const kakaoUserId = String(input.user.id);
-  const profile = input.user.kakao_account?.profile;
+  const account = input.user.kakao_account;
+  const profile = account?.profile;
+  const displayName = account?.name ?? account?.legal_name ?? profile?.nickname ?? null;
   const [member] = await db
     .insert(members)
     .values({
       kakaoUserId,
-      nickname: profile?.nickname ?? null,
+      nickname: displayName,
       profileImageUrl: profile?.profile_image_url ?? null,
       channelFriendStatus: input.channelFriendStatus,
       lastLoginAt: now,
@@ -123,7 +128,7 @@ export async function upsertKakaoMember(input: {
     .onConflictDoUpdate({
       target: members.kakaoUserId,
       set: {
-        nickname: profile?.nickname ?? null,
+        nickname: displayName,
         profileImageUrl: profile?.profile_image_url ?? null,
         channelFriendStatus: input.channelFriendStatus,
         lastLoginAt: now,
@@ -133,12 +138,54 @@ export async function upsertKakaoMember(input: {
     })
     .returning({ id: members.id, kakaoUserId: members.kakaoUserId });
 
+  const sql = getSql();
+  const signupIdempotencyKey = `signup:${store.id}:${member.id}`;
+
   await db
     .insert(storeMemberships)
     .values({ storeId: store.id, memberId: member.id })
     .onConflictDoNothing({
       target: [storeMemberships.storeId, storeMemberships.memberId],
     });
+
+  await sql`
+    with membership as (
+      select id, points_balance
+      from store_memberships
+      where store_id = ${store.id} and member_id = ${member.id}
+      limit 1
+    ), bonus as (
+      insert into point_transactions (
+        membership_id,
+        transaction_type,
+        amount,
+        balance_after,
+        description,
+        reference_type,
+        reference_id,
+        idempotency_key
+      )
+      select
+        id,
+        'earn',
+        500,
+        points_balance + 500,
+        '신규 가입 축하 포인트',
+        'signup',
+        ${member.id},
+        ${signupIdempotencyKey}
+      from membership
+      on conflict (idempotency_key) do nothing
+      returning membership_id
+    )
+    update store_memberships as sm
+    set
+      points_balance = sm.points_balance + 500,
+      lifetime_points = sm.lifetime_points + 500,
+      updated_at = now()
+    from bonus
+    where sm.id = bonus.membership_id
+  `;
 
   return member;
 }

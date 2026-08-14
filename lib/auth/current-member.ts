@@ -1,4 +1,4 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { getDb } from "../../db";
 import { members, storeMemberships } from "../../db/schema";
@@ -22,6 +22,13 @@ export async function getCurrentMember(storeId: string): Promise<MemberView | nu
         pointsBalance: storeMemberships.pointsBalance,
         lifetimePoints: storeMemberships.lifetimePoints,
         visitCount: storeMemberships.visitCount,
+        couponCount: sql<number>`(
+          select count(*)::int
+          from member_coupons mc
+          where mc.membership_id = ${storeMemberships.id}
+            and mc.status = 'available'
+            and mc.expires_at > now()
+        )`,
       })
       .from(storeMemberships)
       .innerJoin(members, eq(storeMemberships.memberId, members.id))

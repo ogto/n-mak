@@ -445,6 +445,17 @@ button {
   letter-spacing: -.04em;
 }
 
+.member-name-button {
+  align-self: flex-start;
+  margin-top: 10px;
+  padding: 7px 11px;
+  color: #413700;
+  border-radius: 9px;
+  background: #fee500;
+  font-size: 11px;
+  font-weight: 850;
+}
+
 .points {
   display: flex;
   flex-direction: column;
@@ -2557,6 +2568,48 @@ button {
   box-shadow: 0 12px 34px rgba(12, 47, 60, .08);
 }
 
+.detail-login-card,
+.detail-empty-card {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding-block: 34px;
+  text-align: center;
+}
+
+.detail-login-card h2,
+.detail-empty-card h2 {
+  margin: 8px 0 0;
+  font-size: 23px;
+  letter-spacing: -.05em;
+}
+
+.detail-login-card p,
+.detail-empty-card p {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.detail-login-card .kakao-login-button,
+.detail-empty-card .detail-primary {
+  width: min(100%, 360px);
+}
+
+.detail-empty-card .quick-icon {
+  width: 76px;
+  height: 76px;
+  margin: 0;
+}
+
+.detail-empty-inline {
+  padding: 30px 0 12px;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+
 .detail-card-heading,
 .list-heading {
   display: flex;
@@ -2764,6 +2817,11 @@ button {
   padding: 8px 0;
   color: var(--muted);
   background: transparent;
+  font-size: 11px;
+}
+
+.list-heading > span {
+  color: var(--muted);
   font-size: 11px;
 }
 
@@ -3060,7 +3118,9 @@ button {
   .detail-summary,
   .point-balance,
   .detail-coupon-list,
-  .store-map-card {
+  .store-map-card,
+  .detail-login-card,
+  .detail-empty-card {
     grid-column: 1 / -1;
   }
 

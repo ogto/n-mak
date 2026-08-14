@@ -12,33 +12,27 @@ const SUCCESS_END = 82;
 const GAUGE_CYCLE_MS = 2200;
 
 type GameReward = {
+  id: string;
   name: string;
   description: string;
-  probability: number;
+  rewardType: "coupon" | "points";
+  rewardValue: number | null;
   tone: string;
-  golden?: boolean;
+  golden: boolean;
 };
 
-const rewards: GameReward[] = [
-  { name: "맛보기 해산물", description: "오늘의 해산물 한 접시", probability: 5, tone: "gold", golden: true },
-  { name: "소주 1병", description: "테이블당 1회 사용 가능", probability: 10, tone: "mint" },
-  { name: "맥주 1병", description: "테이블당 1회 사용 가능", probability: 10, tone: "blue" },
-  { name: "음료 1캔", description: "원하는 탄산음료 1캔", probability: 15, tone: "coral" },
-  { name: "500 포인트", description: "결제할 때 바로 사용 가능", probability: 20, tone: "navy" },
-  { name: "300 포인트", description: "멤버십 포인트 즉시 적립", probability: 20, tone: "aqua" },
-  { name: "모둠회 10% 할인", description: "5만원 이상 주문 시 사용", probability: 20, tone: "violet" },
-];
+type GamePlayResponse = {
+  reward?: Omit<GameReward, "tone">;
+  error?: string;
+};
 
-function drawReward() {
-  const roll = Math.random() * 100;
-  let accumulated = 0;
-
-  for (const reward of rewards) {
-    accumulated += reward.probability;
-    if (roll < accumulated) return reward;
-  }
-
-  return rewards[rewards.length - 1];
+function rewardTone(reward: Omit<GameReward, "tone">) {
+  if (reward.golden) return "gold";
+  if (reward.rewardType === "points") return reward.rewardValue === 500 ? "navy" : "aqua";
+  if (reward.name.includes("소주")) return "mint";
+  if (reward.name.includes("맥주")) return "blue";
+  if (reward.name.includes("음료")) return "coral";
+  return "violet";
 }
 
 type FishingGameProps = {
@@ -50,7 +44,7 @@ export function FishingGame({ store }: FishingGameProps) {
   const [phase, setPhase] = useState<GamePhase>("ready");
   const [gauge, setGauge] = useState(0);
   const [reward, setReward] = useState<GameReward | null>(null);
-  const [claimed, setClaimed] = useState(false);
+  const [gameError, setGameError] = useState("");
 
   const theme = {
     "--navy": store.theme.navy,
@@ -63,7 +57,7 @@ export function FishingGame({ store }: FishingGameProps) {
   } as CSSProperties;
 
   useEffect(() => {
-    if (phase !== "casting" && phase !== "catching") return;
+    if (phase !== "casting" && !(phase === "catching" && reward)) return;
 
     const timer = window.setTimeout(
       () => setPhase(phase === "casting" ? "timing" : "result"),
@@ -71,7 +65,7 @@ export function FishingGame({ store }: FishingGameProps) {
     );
 
     return () => window.clearTimeout(timer);
-  }, [phase]);
+  }, [phase, reward]);
 
   useEffect(() => {
     if (phase !== "timing") return;
@@ -89,10 +83,25 @@ export function FishingGame({ store }: FishingGameProps) {
     return () => window.cancelAnimationFrame(frame);
   }, [phase]);
 
-  const handleStageTap = () => {
+  const issueReward = async () => {
+    const response = await fetch("/api/game/play", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ storeCode: store.publicCode }),
+    });
+    const result = await response.json() as GamePlayResponse;
+
+    if (!response.ok || !result.reward) {
+      throw new Error(result.error ?? "게임 보상을 저장하지 못했습니다.");
+    }
+
+    setReward({ ...result.reward, tone: rewardTone(result.reward) });
+  };
+
+  const handleStageTap = async () => {
     if (phase === "ready") {
       setReward(null);
-      setClaimed(false);
+      setGameError("");
       setGauge(0);
       window.navigator.vibrate?.(15);
       setPhase("casting");
@@ -101,9 +110,14 @@ export function FishingGame({ store }: FishingGameProps) {
 
     if (phase === "timing") {
       if (gauge >= SUCCESS_START && gauge <= SUCCESS_END) {
-        setReward(drawReward());
         window.navigator.vibrate?.([35, 30, 70]);
         setPhase("catching");
+        try {
+          await issueReward();
+        } catch (error) {
+          setGameError(error instanceof Error ? error.message : "게임 보상을 저장하지 못했습니다.");
+          setPhase("miss");
+        }
       } else {
         window.navigator.vibrate?.(20);
         setPhase("miss");
@@ -113,7 +127,7 @@ export function FishingGame({ store }: FishingGameProps) {
 
   const resetGame = () => {
     setReward(null);
-    setClaimed(false);
+    setGameError("");
     setGauge(0);
     setPhase("ready");
   };
@@ -123,7 +137,9 @@ export function FishingGame({ store }: FishingGameProps) {
     casting: { title: "낚싯줄 던지는 중!", description: "물고기가 있는 곳으로 날아가고 있어요." },
     timing: { title: "초록색에서 한 번 더!", description: "넓은 초록 구간에 바늘이 들어오면 탭하세요." },
     catching: { title: reward?.golden ? "황금 물고기다!" : "손맛이 왔어요!", description: "낚싯대가 휘었어요. 힘껏 끌어올리는 중!" },
-    miss: { title: "앗, 살짝 빨랐어요", description: "초록 구간이 넓으니 천천히 다시 해보세요." },
+    miss: gameError
+      ? { title: "보상을 확인하지 못했어요", description: gameError }
+      : { title: "앗, 살짝 빨랐어요", description: "초록 구간이 넓으니 천천히 다시 해보세요." },
     result: { title: reward?.golden ? "대박! 황금 물고기!" : "낚시 성공!", description: "오늘의 행운 보상을 확인해보세요." },
   };
 
@@ -206,9 +222,11 @@ export function FishingGame({ store }: FishingGameProps) {
         {phase === "miss" && (
           <section className="game-result miss-result">
             <span className="reward-catch-mark miss-mark" aria-hidden="true">↻</span>
-            <h2>바로 다시 해볼까요?</h2>
-            <p>바늘이 넓은 초록색 안에 있을 때 탭하면 쉽게 잡을 수 있어요.</p>
-            <button onClick={resetGame}>한 번 더 던지기</button>
+            <h2>{gameError ? "로그인 상태를 확인해 주세요" : "바로 다시 해볼까요?"}</h2>
+            <p>{gameError || "바늘이 넓은 초록색 안에 있을 때 탭하면 쉽게 잡을 수 있어요."}</p>
+            <button onClick={gameError ? () => router.push(`/s/${store.publicCode}`) : resetGame}>
+              {gameError ? "홈으로 돌아가기" : "한 번 더 던지기"}
+            </button>
           </section>
         )}
 
@@ -217,8 +235,10 @@ export function FishingGame({ store }: FishingGameProps) {
             <span className="reward-catch-mark" aria-hidden="true">{reward.golden ? "★" : "✓"}</span>
             <h2>{reward.name}</h2>
             <p>{reward.description}</p>
-            <button onClick={() => setClaimed(true)} disabled={claimed}>{claimed ? "보상 저장 완료" : "보상 받기"}</button>
-            <button className="game-retry" onClick={resetGame}>다시 해보기</button>
+            <button onClick={() => router.push(`/s/${store.publicCode}/${reward.rewardType === "coupon" ? "coupons" : "points"}`)}>
+              {reward.rewardType === "coupon" ? "내 쿠폰함 확인" : "적립 포인트 확인"}
+            </button>
+            <button className="game-retry" onClick={() => router.push(`/s/${store.publicCode}`)}>홈으로 돌아가기</button>
           </section>
         )}
       </section>
