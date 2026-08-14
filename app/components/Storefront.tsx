@@ -31,7 +31,7 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
   useEffect(() => {
     if (!member || store.internalKey !== "a-fish-brothers") return;
 
-    const storageKey = `promoSeen:${store.publicCode}:cold-noodle`;
+    const storageKey = `promoSeen:${store.publicCode}:shrimp-salt-grill`;
     const seenAt = Number(window.localStorage.getItem(storageKey) ?? 0);
     const sevenDays = 7 * 24 * 60 * 60 * 1000;
     if (seenAt > 0 && Date.now() - seenAt < sevenDays) return;
@@ -80,7 +80,7 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
   };
 
   const closePromo = () => {
-    window.localStorage.setItem(`promoSeen:${store.publicCode}:cold-noodle`, String(Date.now()));
+    window.localStorage.setItem(`promoSeen:${store.publicCode}:shrimp-salt-grill`, String(Date.now()));
     setPromoOpen(false);
   };
 
@@ -228,21 +228,19 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
 
       {promoOpen && (
         <div className="modal-backdrop promo-backdrop">
-          <section className="game-modal promo-modal" role="dialog" aria-modal="true" aria-labelledby="promo-title">
+          <section className="game-modal promo-modal" role="dialog" aria-modal="true" aria-label="대하 소금구이 신메뉴 안내">
             <div className="promo-image-wrap">
               <Image
                 className="promo-image"
-                src="/stores/fish-brothers/cold-noodle-promo.png"
-                alt="전복에 빠진 냉 비빔물국수 신메뉴"
-                width={1456}
-                height={1086}
+                src="/stores/fish-brothers/shrimp-promo.webp"
+                alt="탱글탱글 신선한 대하 소금구이 개시"
+                width={1200}
+                height={1700}
                 priority
                 unoptimized
               />
             </div>
             <div className="promo-body">
-              <h2 id="promo-title">시원하고 칼칼한<br />여름 신메뉴</h2>
-              <p>전복과 아삭한 채소를 푸짐하게 담은 냉 비빔물국수를 만나보세요.</p>
               <button className="primary-button" onClick={closePromo}>확인</button>
             </div>
           </section>
