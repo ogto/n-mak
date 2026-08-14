@@ -3298,3 +3298,136 @@ button {
     transition-duration: .01ms !important;
   }
 }
+
+/* Kakao membership */
+.member-card-guest {
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+.member-card-guest > div:first-child {
+  gap: 4px;
+}
+
+.member-card-guest > div:first-child p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.kakao-login-button {
+  width: 100%;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 18px;
+  color: #191919;
+  border-radius: 14px;
+  background: #fee500;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.kakao-login-button > span,
+.channel-login-button > span {
+  width: 25px;
+  height: 25px;
+  display: grid;
+  place-content: center;
+  flex: 0 0 auto;
+  color: #fee500;
+  border-radius: 50%;
+  background: #191919;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.kakao-login-button:disabled,
+.channel-card button:disabled {
+  cursor: default;
+  opacity: .68;
+}
+
+.channel-card .channel-login-button,
+.channel-card .channel-added {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.channel-card .channel-added {
+  color: #3c2b20;
+  background: rgba(255, 255, 255, .72);
+}
+
+.auth-backdrop {
+  z-index: 90;
+}
+
+.auth-modal {
+  position: relative;
+  width: min(420px, calc(100% - 28px));
+  padding: 42px 24px 26px;
+  text-align: center;
+}
+
+.auth-modal h2 {
+  margin: 14px 0 8px;
+  color: var(--ink);
+  font-size: 26px;
+}
+
+.auth-modal > p {
+  max-width: 310px;
+  margin: 0 auto 24px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.auth-bubble {
+  width: 58px;
+  height: 52px;
+  display: grid;
+  place-content: center;
+  margin: 0 auto;
+  color: #fee500;
+  border-radius: 50%;
+  background: #191919;
+  font-size: 22px;
+  font-weight: 950;
+}
+
+.auth-bubble::after {
+  content: "";
+  position: absolute;
+  margin: 42px 0 0 -28px;
+  border-top: 12px solid #191919;
+  border-right: 10px solid transparent;
+}
+
+.auth-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-content: center;
+  color: #809097;
+  border-radius: 50%;
+  background: #edf1f1;
+  font-size: 26px;
+  line-height: 1;
+}
+
+@media (min-width: 700px) {
+  .member-card-guest {
+    grid-template-columns: 1fr minmax(250px, 320px);
+    align-items: center;
+  }
+}
