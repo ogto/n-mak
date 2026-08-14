@@ -50,16 +50,18 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
     if (!status) return;
 
     const messages: Record<string, string> = {
-      success: "카카오 로그인이 완료됐어요.",
       consent_required: "아래 버튼을 눌러 카카오 로그인을 완료해 주세요.",
       failed: "로그인에 실패했어요. 다시 시도해 주세요.",
       invalid_state: "로그인에 실패했어요. 다시 시도해 주세요.",
       cancelled: "카카오 로그인이 취소됐어요.",
     };
-    const timer = window.setTimeout(() => setToast(messages[status] ?? ""), 0);
+    const message = messages[status] ?? "";
+    const timer = message ? window.setTimeout(() => setToast(message), 0) : undefined;
     url.searchParams.delete("auth");
     window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
-    return () => window.clearTimeout(timer);
+    return () => {
+      if (timer) window.clearTimeout(timer);
+    };
   }, []);
 
   const theme = {
@@ -166,13 +168,9 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
               <strong>
                 {member.nickname ? `${member.nickname}님, 반가워요!` : "카카오 가입을 마무리해 주세요"}
               </strong>
-              <span className="member-login-status">
-                <i aria-hidden="true" />
-                카카오 로그인 완료
-              </span>
               {!member.nickname && (
                 <div className="member-onboarding-prompt">
-                  <p>로그인은 완료됐어요. 닉네임과 채널 동의를 한 번만 확인하면 가입이 끝나요.</p>
+                  <p>닉네임과 채널 동의를 한 번만 확인하면 가입이 끝나요.</p>
                   <KakaoAuthButton
                     javascriptKey={kakao.javascriptKey}
                     channelPublicId={kakao.channelPublicId}
@@ -193,19 +191,14 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
               <span style={{ width: `${Math.min(100, member.lifetimePoints / 40)}%` }} />
             </div>
             <p>방문 {member.visitCount}회 · 적립 포인트는 매장에서 바로 사용할 수 있어요.</p>
-            {member.channelFriendStatus === "added" ? (
-              <div className="member-channel-status added">
-                <span aria-hidden="true">✓</span>
-                카카오톡 채널 친구 추가 완료
-              </div>
-            ) : member.channelFriendStatus === "blocked" ? (
+            {member.channelFriendStatus === "blocked" ? (
               <div className="member-channel-row">
                 <div>
                   <strong>카카오톡 채널 수신이 차단되어 있어요</strong>
                   <span>카카오톡 채널에서 차단을 해제하면 신메뉴와 쿠폰 소식을 받을 수 있어요.</span>
                 </div>
               </div>
-            ) : !member.nickname ? null : (
+            ) : member.channelFriendStatus === "added" || !member.nickname ? null : (
               <div className="member-channel-status pending">
                 <span aria-hidden="true">!</span>
                 채널 추가 동의가 완료되지 않았어요
