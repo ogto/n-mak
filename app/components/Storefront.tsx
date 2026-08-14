@@ -50,17 +50,20 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
     if (!status) return;
 
     const messages: Record<string, string> = {
+      success: "카카오 로그인이 완료됐어요.",
       consent_required: "아래 버튼을 눌러 카카오 로그인을 완료해 주세요.",
       failed: "로그인에 실패했어요. 다시 시도해 주세요.",
       invalid_state: "로그인에 실패했어요. 다시 시도해 주세요.",
       cancelled: "카카오 로그인이 취소됐어요.",
     };
     const message = messages[status] ?? "";
-    const timer = message ? window.setTimeout(() => setToast(message), 0) : undefined;
+    const showTimer = message ? window.setTimeout(() => setToast(message), 0) : undefined;
+    const hideTimer = message ? window.setTimeout(() => setToast(""), 2200) : undefined;
     url.searchParams.delete("auth");
     window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
     return () => {
-      if (timer) window.clearTimeout(timer);
+      if (showTimer) window.clearTimeout(showTimer);
+      if (hideTimer) window.clearTimeout(hideTimer);
     };
   }, []);
 
