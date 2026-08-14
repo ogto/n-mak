@@ -48,6 +48,8 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
     const messages: Record<string, string> = {
       success: "카카오 로그인이 완료됐어요.",
       consent_required: "아래 버튼을 눌러 카카오 로그인을 완료해 주세요.",
+      channel_required: "카카오톡 채널을 추가하면 500P를 받을 수 있어요.",
+      channel_check_failed: "채널 친구 확인이 지연되고 있어요. 잠시 후 다시 시도해 주세요.",
       failed: "로그인에 실패했어요. 다시 시도해 주세요.",
       invalid_state: "로그인에 실패했어요. 다시 시도해 주세요.",
       cancelled: "카카오 로그인이 취소됐어요.",

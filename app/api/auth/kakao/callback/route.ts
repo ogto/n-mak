@@ -46,6 +46,15 @@ export async function GET(request: NextRequest) {
     const user = await getKakaoUser(accessToken);
     const channelPublicId = process.env.KAKAO_CHANNEL_ID ?? "";
     const channelFriendStatus = await getKakaoChannelFriendStatus(accessToken, channelPublicId);
+
+    if (channelFriendStatus === "unknown") {
+      return redirectWithStatus(request, state.returnTo, "channel_check_failed");
+    }
+
+    if (channelFriendStatus !== "added") {
+      return redirectWithStatus(request, state.returnTo, "channel_required");
+    }
+
     const member = await upsertKakaoMember({
       user,
       storeCode: state.storeCode,

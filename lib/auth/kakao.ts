@@ -27,6 +27,14 @@ type KakaoChannelResponse = {
   }>;
 };
 
+type KakaoUnlinkResponse = {
+  id?: number;
+  code?: number;
+  msg?: string;
+};
+
+export type KakaoChannelFriendStatus = "unknown" | "added" | "not_added" | "blocked";
+
 export async function exchangeKakaoCode(code: string, redirectUri: string) {
   const restApiKey = process.env.KAKAO_REST_API_KEY;
   const clientSecret = process.env.KAKAO_CLIENT_SECRET;
@@ -104,11 +112,40 @@ export async function getKakaoChannelFriendStatus(accessToken: string, channelPu
   }
 }
 
+export async function unlinkKakaoUser(kakaoUserId: string) {
+  const adminKey = process.env.KAKAO_ADMIN_KEY;
+
+  if (!adminKey) {
+    throw new Error("KAKAO_ADMIN_KEY is not configured.");
+  }
+
+  const response = await fetch("https://kapi.kakao.com/v1/user/unlink", {
+    method: "POST",
+    headers: {
+      Authorization: `KakaoAK ${adminKey}`,
+      "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
+    },
+    body: new URLSearchParams({
+      target_id_type: "user_id",
+      target_id: kakaoUserId,
+    }),
+    cache: "no-store",
+  });
+  const result = (await response.json()) as KakaoUnlinkResponse;
+
+  if (!response.ok || String(result.id ?? "") !== kakaoUserId) {
+    throw new Error(`Kakao unlink failed: ${result.code ?? response.status} ${result.msg ?? ""}`.trim());
+  }
+}
+
 export async function upsertKakaoMember(input: {
   user: KakaoUserResponse;
   storeCode: string;
-  channelFriendStatus: "unknown" | "added" | "not_added" | "blocked";
+  channelFriendStatus: KakaoChannelFriendStatus;
 }) {
+  if (input.channelFriendStatus !== "added") {
+    throw new Error("Kakao channel friendship is required before creating a membership.");
+  }
   const db = getDb();
   const [store] = await db
     .select({ id: stores.id })
