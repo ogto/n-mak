@@ -1,11 +1,14 @@
 "use client";
 
+import Image from "next/image";
 import Script from "next/script";
 import { useCallback, useState } from "react";
 
 export const KAKAO_SDK_URL = "https://t1.kakaocdn.net/kakao_js_sdk/2.8.2/kakao.min.js";
 export const KAKAO_SDK_INTEGRITY = "sha384-zt/G7/KfaRQ9dT/QIkS0ujMtzouJqzuSJcXVQu50x0rl/+mD1dc70AeOejVbMD9E";
 export const KAKAO_MEMBERSHIP_SCOPE = "profile_nickname,plusfriends";
+const KAKAO_LOGIN_BUTTON_IMAGE =
+  "https://developers.kakao.com/tool/resource/static/img/button/login/full/ko/kakao_login_large_wide.png";
 
 export type KakaoSdk = {
   init: (javascriptKey: string) => void;
@@ -34,8 +37,6 @@ type KakaoAuthButtonProps = {
   channelPublicId: string;
   storeCode: string;
   returnTo: string;
-  label?: string;
-  className?: string;
   scope?: string;
   onError?: (message: string) => void;
 };
@@ -51,8 +52,6 @@ export function KakaoAuthButton({
   channelPublicId,
   storeCode,
   returnTo,
-  label = "카카오로 시작하기",
-  className = "kakao-login-button",
   scope,
   onError,
 }: KakaoAuthButtonProps) {
@@ -103,12 +102,20 @@ export function KakaoAuthButton({
       />
       <button
         type="button"
-        className={className}
+        className="kakao-login-button"
         disabled={!javascriptKey || !ready || loading}
+        aria-label={loading ? "카카오 로그인 진행 중" : "카카오 로그인"}
+        aria-busy={loading}
         onClick={() => void startLogin()}
       >
-        <span className="kakao-login-symbol" aria-hidden="true" />
-        {loading ? "카카오톡 여는 중…" : label}
+        <Image
+          className="kakao-login-resource"
+          src={KAKAO_LOGIN_BUTTON_IMAGE}
+          alt=""
+          width={600}
+          height={90}
+          unoptimized
+        />
       </button>
     </>
   );

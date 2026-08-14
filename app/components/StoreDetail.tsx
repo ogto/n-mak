@@ -10,30 +10,26 @@ import { KakaoAuthButton } from "./KakaoAuthButton";
 
 export type DetailSection = "attendance" | "coupons" | "points" | "store";
 
-const detailMeta: Record<DetailSection, { eyebrow: string; title: string; description: string; icon: string; tone: string }> = {
+const detailMeta: Record<DetailSection, { title: string; description: string; icon: string; tone: string }> = {
   attendance: {
-    eyebrow: "DAILY CHECK-IN",
     title: "출석체크",
     description: "하루 한 번 출석하고 100P를 받아보세요.",
     icon: "attendance",
     tone: "mint",
   },
   coupons: {
-    eyebrow: "MY COUPONS",
     title: "내 쿠폰함",
     description: "게임과 이벤트로 받은 쿠폰을 확인하세요.",
     icon: "ticket",
     tone: "coral",
   },
   points: {
-    eyebrow: "MY POINTS",
     title: "포인트",
     description: "적립한 포인트와 이용 내역을 확인하세요.",
     icon: "points",
     tone: "blue",
   },
   store: {
-    eyebrow: "STORE INFO",
     title: "매장정보",
     description: "방문 전 위치와 영업시간을 확인하세요.",
     icon: "store",
@@ -226,7 +222,6 @@ export function StoreDetail({ store, section, member, membership, kakao }: Store
 
       <section className="detail-intro">
         <div>
-          <span className="detail-eyebrow">{meta.eyebrow}</span>
           <h1>{meta.title}</h1>
           <p>{meta.description}</p>
         </div>
@@ -238,7 +233,6 @@ export function StoreDetail({ store, section, member, membership, kakao }: Store
       <div className="detail-content">
         {privateSection && (!member || !data) && (
           <DetailCard className="detail-login-card">
-            <span className="auth-bubble" aria-hidden="true">K</span>
             <h2>카카오로 로그인해 주세요</h2>
             <p>내 출석, 쿠폰, 포인트를 안전하게 불러올게요.</p>
             <KakaoAuthButton
@@ -278,7 +272,6 @@ export function StoreDetail({ store, section, member, membership, kakao }: Store
               </button>
             </DetailCard>
             <DetailCard className="reward-card">
-              <span className="mini-label">MEMBERSHIP POINT</span>
               <h2>출석할 때마다<br />100P가 바로 적립돼요</h2>
               <div className="reward-progress"><span style={{ width: `${Math.max(8, recentCheckinCount / 7 * 100)}%` }} /></div>
               <p>현재 사용 가능한 포인트는 {data.pointsBalance.toLocaleString()}P예요.</p>
@@ -298,7 +291,7 @@ export function StoreDetail({ store, section, member, membership, kakao }: Store
                 {availableCoupons.map((coupon, index) => (
                   <article className="coupon" key={coupon.id}>
                     <div className={`coupon-badge ${index % 2 === 0 ? "navy" : "coral"}`}>
-                      <b>혜택</b><span>COUPON</span>
+                      <b>혜택</b><span>쿠폰</span>
                     </div>
                     <div className="coupon-copy">
                       <strong>{coupon.title}</strong>
@@ -386,7 +379,6 @@ export function StoreDetail({ store, section, member, membership, kakao }: Store
             <span className="quick-icon coral" aria-hidden="true">
               <span className="menu-icon ticket" />
             </span>
-            <span className="detail-eyebrow">COUPON USE</span>
             <h2 id="coupon-confirm-title">{redeemingCoupon.title}</h2>
             <p>직원에게 이 화면을 보여드린 뒤 사용 완료를 눌러주세요. 처리 후에는 되돌릴 수 없어요.</p>
             <button className="detail-primary" disabled={redeeming} onClick={redeemCoupon}>

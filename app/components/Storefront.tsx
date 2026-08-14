@@ -21,10 +21,6 @@ type StorefrontProps = {
   kakao: PublicKakaoConfig;
 };
 
-function tierLabel(tier: string) {
-  return `${tier.toUpperCase()} MEMBER`;
-}
-
 export function Storefront({ store, member, kakao }: StorefrontProps) {
   const router = useRouter();
   const [promoOpen, setPromoOpen] = useState(false);
@@ -130,7 +126,6 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
 
         <div className="welcome">
           <div className="welcome-copy">
-            <span className="eyebrow">WELCOME</span>
             <h1>
               오늘의 행운을
               <br />
@@ -167,7 +162,6 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
         {member ? (
           <div className="member-card">
             <div>
-              <span className="member-tier">{tierLabel(member.tier)}</span>
               <strong>
                 {member.nickname ? `${member.nickname}님, 반가워요!` : "카카오 가입을 마무리해 주세요"}
               </strong>
@@ -178,8 +172,6 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
                     channelPublicId={kakao.channelPublicId}
                     storeCode={store.publicCode}
                     returnTo={returnTo}
-                    label="동의하고 가입 완료"
-                    className="member-name-button"
                     onError={notify}
                   />
                 </div>
@@ -205,7 +197,6 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
         ) : (
           <div className="member-card member-card-guest">
             <div>
-              <span className="member-tier">FRESH MEMBER</span>
               <strong>지금 카톡 친구 추가하고 500P 받자!</strong>
               <p>가입 혜택 챙기고 행운의 대어까지 낚아보세요.</p>
             </div>
@@ -214,7 +205,6 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
               channelPublicId={kakao.channelPublicId}
               storeCode={store.publicCode}
               returnTo={returnTo}
-              label="친구 추가하고 500P 받기"
               onError={notify}
             />
           </div>
@@ -249,7 +239,6 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
               />
             </div>
             <div className="promo-body">
-              <span className="modal-eyebrow">NEW MENU</span>
               <h2 id="promo-title">시원하고 칼칼한<br />여름 신메뉴</h2>
               <p>전복과 아삭한 채소를 푸짐하게 담은 냉 비빔물국수를 만나보세요.</p>
               <button className="primary-button" onClick={closePromo}>확인</button>
@@ -268,14 +257,12 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
             onClick={(event) => event.stopPropagation()}
           >
             <button className="auth-close" onClick={() => setLoginOpen(false)} aria-label="닫기">×</button>
-            <span className="auth-bubble" aria-hidden="true" />
             <h2 id="auth-title">500P 받고 대어 잡으러 가요!</h2>
             <KakaoAuthButton
               javascriptKey={kakao.javascriptKey}
               channelPublicId={kakao.channelPublicId}
               storeCode={store.publicCode}
               returnTo={returnTo}
-              label="친구 추가하고 500P 받기"
               onError={notify}
             />
           </section>

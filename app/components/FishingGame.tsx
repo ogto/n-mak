@@ -258,7 +258,6 @@ export function FishingGame({ store, member, initialReward, kakao }: FishingGame
 
         {!member && (
           <section className="game-login-gate" role="dialog" aria-modal="true" aria-labelledby="game-login-title">
-            <span className="auth-bubble" aria-hidden="true">K</span>
             <h2 id="game-login-title">카카오 로그인 후 참여해요</h2>
             <p>가입 즉시 500P를 받고, 오늘의 낚시 보상도 내 쿠폰함에 바로 저장돼요.</p>
             <KakaoAuthButton

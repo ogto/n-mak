@@ -227,16 +227,8 @@ button {
   margin-top: 48px;
 }
 
-.eyebrow {
-  display: block;
-  color: var(--aqua);
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: .14em;
-}
-
 .welcome h1 {
-  margin: 12px 0 12px;
+  margin: 0 0 12px;
   font-size: clamp(42px, 12vw, 54px);
   line-height: 1.04;
   letter-spacing: -.065em;
@@ -432,32 +424,10 @@ button {
   flex-direction: column;
 }
 
-.member-tier {
-  color: var(--blue);
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: .12em;
-}
-
 .member-card strong {
-  margin-top: 5px;
+  margin-top: 0;
   font-size: 17px;
   letter-spacing: -.04em;
-}
-
-.member-name-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  align-self: flex-start;
-  margin-top: 10px;
-  padding: 7px 11px;
-  color: #413700;
-  border-radius: 9px;
-  background: #fee500;
-  font-size: 11px;
-  font-weight: 850;
 }
 
 .points {
@@ -1072,15 +1042,8 @@ button {
   font-size: 27px;
 }
 
-.modal-eyebrow {
-  color: var(--coral);
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: .14em;
-}
-
 .game-modal h2 {
-  margin: 8px 0 16px;
+  margin: 0 0 16px;
   font-size: 32px;
   line-height: 1.15;
   letter-spacing: -.07em;
@@ -2521,16 +2484,8 @@ button {
   color: white;
 }
 
-.detail-eyebrow,
-.mini-label {
-  color: var(--aqua);
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: .14em;
-}
-
 .detail-intro h1 {
-  margin: 7px 0 7px;
+  margin: 0 0 7px;
   font-size: clamp(36px, 10vw, 48px);
   line-height: 1;
   letter-spacing: -.07em;
@@ -3382,20 +3337,20 @@ button {
 
 .kakao-login-button {
   width: 100%;
-  min-height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 14px 18px;
-  color: #191919;
-  border-radius: 14px;
-  background: #fee500;
-  font-size: 15px;
-  font-weight: 900;
+  display: block;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  background: transparent;
+  line-height: 0;
 }
 
-.kakao-login-symbol,
+.kakao-login-resource {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 .channel-login-button > span {
   width: 25px;
   height: 22px;
@@ -3404,17 +3359,6 @@ button {
   flex: 0 0 auto;
   border-radius: 50%;
   background: #191919;
-}
-
-.kakao-login-symbol::after {
-  content: "";
-  position: absolute;
-  left: 3px;
-  bottom: -3px;
-  width: 8px;
-  height: 7px;
-  background: #191919;
-  clip-path: polygon(0 0, 100% 0, 0 100%);
 }
 
 .kakao-login-button:disabled,
@@ -3448,7 +3392,7 @@ button {
 }
 
 .auth-modal h2 {
-  margin: 14px 0 8px;
+  margin: 0 0 20px;
   color: var(--ink);
   font-size: 26px;
 }
@@ -3459,27 +3403,6 @@ button {
   color: var(--muted);
   font-size: 14px;
   line-height: 1.6;
-}
-
-.auth-bubble {
-  width: 58px;
-  height: 52px;
-  position: relative;
-  display: block;
-  margin: 0 auto;
-  border-radius: 50%;
-  background: #191919;
-}
-
-.auth-bubble::after {
-  content: "";
-  position: absolute;
-  left: 7px;
-  bottom: -7px;
-  width: 18px;
-  height: 16px;
-  background: #191919;
-  clip-path: polygon(0 0, 100% 0, 0 100%);
 }
 
 /* Membership flow completion */
@@ -3549,12 +3472,6 @@ button {
   color: var(--muted);
   font-size: 12px;
   line-height: 1.5;
-}
-
-.member-onboarding-prompt .member-name-button {
-  min-height: 42px;
-  margin-top: 10px;
-  padding: 9px 14px;
 }
 
 .member-channel-row {
@@ -3646,7 +3563,7 @@ button {
 }
 
 .game-login-gate h2 {
-  margin: 18px 0 8px;
+  margin: 0 0 8px;
   color: white;
   font-size: clamp(27px, 7vw, 38px);
   font-weight: 950;
