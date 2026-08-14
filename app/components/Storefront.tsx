@@ -206,14 +206,15 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
           <div className="member-card member-card-guest">
             <div>
               <span className="member-tier">FRESH MEMBER</span>
-              <strong>카카오로 가입하면 500P를 바로 드려요</strong>
+              <strong>지금 카톡 친구 추가하고 500P 받자!</strong>
+              <p>가입 혜택 챙기고 행운의 대어까지 낚아보세요.</p>
             </div>
             <KakaoAuthButton
               javascriptKey={kakao.javascriptKey}
               channelPublicId={kakao.channelPublicId}
               storeCode={store.publicCode}
               returnTo={returnTo}
-              label="카카오로 가입하고 500P 받기"
+              label="친구 추가하고 500P 받기"
               onError={notify}
             />
           </div>
@@ -268,13 +269,13 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
           >
             <button className="auth-close" onClick={() => setLoginOpen(false)} aria-label="닫기">×</button>
             <span className="auth-bubble" aria-hidden="true" />
-            <h2 id="auth-title">카카오로 바로 시작해요</h2>
+            <h2 id="auth-title">500P 받고 대어 잡으러 가요!</h2>
             <KakaoAuthButton
               javascriptKey={kakao.javascriptKey}
               channelPublicId={kakao.channelPublicId}
               storeCode={store.publicCode}
               returnTo={returnTo}
-              label="카카오로 가입하고 500P 받기"
+              label="친구 추가하고 500P 받기"
               onError={notify}
             />
           </section>
