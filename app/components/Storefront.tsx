@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import type { MemberView, PublicKakaoConfig } from "../../lib/auth/types";
 import type { StoreConfig } from "../../lib/stores";
 import { KakaoAuthButton } from "./KakaoAuthButton";
-import { KakaoChannelButton } from "./KakaoChannelButton";
 
 const quickMenus = [
   { icon: "attendance", label: "출석체크", tone: "mint", section: "attendance" },
@@ -164,18 +163,26 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
           <div className="member-card">
             <div>
               <span className="member-tier">{tierLabel(member.tier)}</span>
-              <strong>{member.nickname ? `${member.nickname}님, 반가워요!` : "회원님, 반가워요!"}</strong>
+              <strong>
+                {member.nickname ? `${member.nickname}님, 반가워요!` : "카카오 가입을 마무리해 주세요"}
+              </strong>
+              <span className="member-login-status">
+                <i aria-hidden="true" />
+                카카오 로그인 완료
+              </span>
               {!member.nickname && (
-                <KakaoAuthButton
-                  javascriptKey={kakao.javascriptKey}
-                  channelPublicId={kakao.channelPublicId}
-                  storeCode={store.publicCode}
-                  returnTo={returnTo}
-                  label="카카오 정보 새로고침"
-                  className="member-name-button"
-                  scope="name,profile_nickname,plusfriends"
-                  onError={notify}
-                />
+                <div className="member-onboarding-prompt">
+                  <p>로그인은 완료됐어요. 닉네임과 채널 동의를 한 번만 확인하면 가입이 끝나요.</p>
+                  <KakaoAuthButton
+                    javascriptKey={kakao.javascriptKey}
+                    channelPublicId={kakao.channelPublicId}
+                    storeCode={store.publicCode}
+                    returnTo={returnTo}
+                    label="동의하고 가입 완료"
+                    className="member-name-button"
+                    onError={notify}
+                  />
+                </div>
               )}
             </div>
             <div className="points">
@@ -189,36 +196,19 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
             {member.channelFriendStatus === "added" ? (
               <div className="member-channel-status added">
                 <span aria-hidden="true">✓</span>
-                카카오톡 채널 연결됨
+                카카오톡 채널 친구 추가 완료
               </div>
-            ) : (
+            ) : member.channelFriendStatus === "blocked" ? (
               <div className="member-channel-row">
                 <div>
-                  <strong>
-                    {member.channelFriendStatus === "blocked"
-                      ? "채널 수신이 차단되어 있어요"
-                      : "채널 친구 추가를 완료해주세요"}
-                  </strong>
-                  <span>신메뉴와 쿠폰 소식을 카카오톡으로 받아보세요.</span>
+                  <strong>카카오톡 채널 수신이 차단되어 있어요</strong>
+                  <span>카카오톡 채널에서 차단을 해제하면 신메뉴와 쿠폰 소식을 받을 수 있어요.</span>
                 </div>
-                <div className="member-channel-actions">
-                  <KakaoChannelButton
-                    javascriptKey={kakao.javascriptKey}
-                    channelPublicId={kakao.channelPublicId}
-                    onReturn={() => router.refresh()}
-                    onError={notify}
-                  />
-                  <KakaoAuthButton
-                    javascriptKey={kakao.javascriptKey}
-                    channelPublicId={kakao.channelPublicId}
-                    storeCode={store.publicCode}
-                    returnTo={returnTo}
-                    label="추가 후 상태 확인"
-                    className="member-channel-sync"
-                    scope="plusfriends"
-                    onError={notify}
-                  />
-                </div>
+              </div>
+            ) : !member.nickname ? null : (
+              <div className="member-channel-status pending">
+                <span aria-hidden="true">!</span>
+                채널 추가 동의가 완료되지 않았어요
               </div>
             )}
           </div>
@@ -226,14 +216,15 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
           <div className="member-card member-card-guest">
             <div>
               <span className="member-tier">FRESH MEMBER</span>
-              <strong>카카오로 시작하고 혜택을 모아보세요</strong>
-              <p>비밀번호 없이 빠르게 로그인할 수 있어요.</p>
+              <strong>카카오로 가입하면 500P를 바로 드려요</strong>
+              <p>닉네임 제공과 채널 추가 동의를 한 화면에서 완료해요.</p>
             </div>
             <KakaoAuthButton
               javascriptKey={kakao.javascriptKey}
               channelPublicId={kakao.channelPublicId}
               storeCode={store.publicCode}
               returnTo={returnTo}
+              label="카카오로 가입하고 500P 받기"
               onError={notify}
             />
           </div>
@@ -287,14 +278,15 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
             onClick={(event) => event.stopPropagation()}
           >
             <button className="auth-close" onClick={() => setLoginOpen(false)} aria-label="닫기">×</button>
-            <span className="auth-bubble" aria-hidden="true">K</span>
+            <span className="auth-bubble" aria-hidden="true" />
             <h2 id="auth-title">카카오로 바로 시작해요</h2>
-            <p>한 번 로그인하면 30일 동안 포인트와 쿠폰을 편하게 확인할 수 있어요.</p>
+            <p>닉네임과 채널 추가를 한 번에 동의하고 가입하면 500P를 바로 드려요.</p>
             <KakaoAuthButton
               javascriptKey={kakao.javascriptKey}
               channelPublicId={kakao.channelPublicId}
               storeCode={store.publicCode}
               returnTo={returnTo}
+              label="카카오로 가입하고 500P 받기"
               onError={notify}
             />
           </section>

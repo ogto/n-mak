@@ -5,6 +5,7 @@ import { useCallback, useState } from "react";
 
 export const KAKAO_SDK_URL = "https://t1.kakaocdn.net/kakao_js_sdk/2.8.2/kakao.min.js";
 export const KAKAO_SDK_INTEGRITY = "sha384-zt/G7/KfaRQ9dT/QIkS0ujMtzouJqzuSJcXVQu50x0rl/+mD1dc70AeOejVbMD9E";
+export const KAKAO_MEMBERSHIP_SCOPE = "profile_nickname,plusfriends";
 
 export type KakaoSdk = {
   init: (javascriptKey: string) => void;
@@ -50,7 +51,7 @@ export function KakaoAuthButton({
   channelPublicId,
   storeCode,
   returnTo,
-  label = "카카오로 1초 로그인",
+  label = "카카오로 시작하기",
   className = "kakao-login-button",
   scope,
   onError,
@@ -82,7 +83,7 @@ export function KakaoAuthButton({
         redirectUri: `${window.location.origin}/api/auth/kakao/callback`,
         state: result.state,
         ...(channelPublicId ? { channelPublicId } : {}),
-        ...(scope ? { scope } : {}),
+        scope: scope ?? KAKAO_MEMBERSHIP_SCOPE,
       });
     } catch (error) {
       setLoading(false);
@@ -106,7 +107,7 @@ export function KakaoAuthButton({
         disabled={!javascriptKey || !ready || loading}
         onClick={() => void startLogin()}
       >
-        <span aria-hidden="true">K</span>
+        <span className="kakao-symbol" aria-hidden="true" />
         {loading ? "카카오톡 여는 중…" : label}
       </button>
     </>

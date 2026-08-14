@@ -446,6 +446,10 @@ button {
 }
 
 .member-name-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   align-self: flex-start;
   margin-top: 10px;
   padding: 7px 11px;
@@ -3391,18 +3395,26 @@ button {
   font-weight: 900;
 }
 
-.kakao-login-button > span,
+.kakao-symbol,
 .channel-login-button > span {
   width: 25px;
-  height: 25px;
-  display: grid;
-  place-content: center;
+  height: 22px;
+  position: relative;
+  display: block;
   flex: 0 0 auto;
-  color: #fee500;
   border-radius: 50%;
   background: #191919;
-  font-size: 12px;
-  font-weight: 900;
+}
+
+.kakao-symbol::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  bottom: -3px;
+  width: 8px;
+  height: 7px;
+  background: #191919;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
 }
 
 .kakao-login-button:disabled,
@@ -3452,22 +3464,22 @@ button {
 .auth-bubble {
   width: 58px;
   height: 52px;
-  display: grid;
-  place-content: center;
+  position: relative;
+  display: block;
   margin: 0 auto;
-  color: #fee500;
   border-radius: 50%;
   background: #191919;
-  font-size: 22px;
-  font-weight: 950;
 }
 
 .auth-bubble::after {
   content: "";
   position: absolute;
-  margin: 42px 0 0 -28px;
-  border-top: 12px solid #191919;
-  border-right: 10px solid transparent;
+  left: 7px;
+  bottom: -7px;
+  width: 18px;
+  height: 16px;
+  background: #191919;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
 }
 
 /* Membership flow completion */
@@ -3497,6 +3509,52 @@ button {
   color: white;
   border-radius: 50%;
   background: #119c8e;
+}
+
+.member-channel-status.pending {
+  color: #6d5f10;
+  background: #fff8d4;
+}
+
+.member-channel-status.pending > span {
+  background: #d6a900;
+}
+
+.member-login-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  margin-top: 7px;
+  color: #08746a;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.member-login-status > i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #13a58f;
+  box-shadow: 0 0 0 4px rgba(19, 165, 143, .11);
+}
+
+.member-onboarding-prompt {
+  margin-top: 10px;
+}
+
+.member-onboarding-prompt > p {
+  max-width: 360px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.member-onboarding-prompt .member-name-button {
+  min-height: 42px;
+  margin-top: 10px;
+  padding: 9px 14px;
 }
 
 .member-channel-row {

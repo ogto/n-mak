@@ -45,6 +45,8 @@ test("server-renders the fish brothers storefront", async () => {
   assert.match(html, /오늘의 행운을/);
   assert.match(html, /출석체크/);
   assert.match(html, /내 쿠폰/);
+  assert.match(html, /카카오로 가입하고 500P 받기/);
+  assert.doesNotMatch(html, /추가 후 상태 확인/);
   assert.doesNotMatch(html, /Your site is taking shape|Building your site/);
 });
 
