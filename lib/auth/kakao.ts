@@ -166,9 +166,7 @@ export async function upsertKakaoMember(input: {
     updatedAt: now,
     ...(displayName ? { nickname: displayName } : {}),
     ...(profile?.profile_image_url ? { profileImageUrl: profile.profile_image_url } : {}),
-    ...(input.channelFriendStatus !== "unknown"
-      ? { channelFriendStatus: input.channelFriendStatus }
-      : {}),
+    channelFriendStatus: input.channelFriendStatus,
   };
   const [member] = await db
     .insert(members)
