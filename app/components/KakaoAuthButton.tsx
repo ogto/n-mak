@@ -107,7 +107,7 @@ export function KakaoAuthButton({
         disabled={!javascriptKey || !ready || loading}
         onClick={() => void startLogin()}
       >
-        <span className="kakao-symbol" aria-hidden="true" />
+        <span className="kakao-login-symbol" aria-hidden="true" />
         {loading ? "카카오톡 여는 중…" : label}
       </button>
     </>

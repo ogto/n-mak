@@ -3395,7 +3395,7 @@ button {
   font-weight: 900;
 }
 
-.kakao-symbol,
+.kakao-login-symbol,
 .channel-login-button > span {
   width: 25px;
   height: 22px;
@@ -3406,7 +3406,7 @@ button {
   background: #191919;
 }
 
-.kakao-symbol::after {
+.kakao-login-symbol::after {
   content: "";
   position: absolute;
   left: 3px;
