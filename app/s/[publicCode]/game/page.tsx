@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { FishingGame } from "../../../components/FishingGame";
+import { getCurrentMember } from "../../../../lib/auth/current-member";
+import { getTodayGamePlay } from "../../../../lib/membership";
 import { getStoreByPublicCode } from "../../../../lib/stores";
+
+export const dynamic = "force-dynamic";
 
 type GamePageProps = {
   params: Promise<{ publicCode: string }>;
@@ -23,5 +27,18 @@ export default async function GamePage({ params }: GamePageProps) {
 
   if (!store) notFound();
 
-  return <FishingGame store={store} />;
+  const member = await getCurrentMember(store.id);
+  const todayPlay = member ? await getTodayGamePlay(store.id, member.id) : null;
+
+  return (
+    <FishingGame
+      store={store}
+      member={member}
+      initialReward={todayPlay}
+      kakao={{
+        javascriptKey: process.env.NEXT_PUBLIC_KAKAO_JS_KEY ?? "",
+        channelPublicId: process.env.KAKAO_CHANNEL_ID ?? store.kakaoChannelId,
+      }}
+    />
+  );
 }

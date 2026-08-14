@@ -4,7 +4,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { MemberView, PublicKakaoConfig } from "../../lib/auth/types";
-import type { MembershipDetailView } from "../../lib/membership";
+import type { MembershipCouponView, MembershipDetailView } from "../../lib/membership";
 import type { StoreConfig } from "../../lib/stores";
 import { KakaoAuthButton } from "./KakaoAuthButton";
 
@@ -57,6 +57,12 @@ type CheckinResponse = {
   error?: string;
 };
 
+type RedeemCouponResponse = {
+  redeemed?: boolean;
+  couponId?: string;
+  error?: string;
+};
+
 function DetailCard({ children, className = "" }: { children: ReactNode; className?: string }) {
   return <section className={`detail-card ${className}`}>{children}</section>;
 }
@@ -98,6 +104,8 @@ export function StoreDetail({ store, section, member, membership, kakao }: Store
   const router = useRouter();
   const [data, setData] = useState(membership);
   const [checkingIn, setCheckingIn] = useState(false);
+  const [redeemingCoupon, setRedeemingCoupon] = useState<MembershipCouponView | null>(null);
+  const [redeeming, setRedeeming] = useState(false);
   const [toast, setToast] = useState("");
   const meta = detailMeta[section];
   const days = recentSevenDays();
@@ -164,6 +172,38 @@ export function StoreDetail({ store, section, member, membership, kakao }: Store
       notify("주소를 복사했어요.");
     } catch {
       notify(store.address);
+    }
+  };
+
+  const redeemCoupon = async () => {
+    if (!redeemingCoupon || redeeming) return;
+    setRedeeming(true);
+
+    try {
+      const response = await fetch(`/api/membership/coupons/${redeemingCoupon.id}/redeem`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ storeCode: store.publicCode }),
+      });
+      const result = await response.json() as RedeemCouponResponse;
+
+      if (!response.ok || !result.redeemed || result.couponId !== redeemingCoupon.id) {
+        throw new Error(result.error ?? "쿠폰을 사용 처리하지 못했습니다.");
+      }
+
+      setData((current) => current ? {
+        ...current,
+        coupons: current.coupons.map((coupon) => coupon.id === redeemingCoupon.id
+          ? { ...coupon, status: "used" as const }
+          : coupon),
+      } : current);
+      setRedeemingCoupon(null);
+      notify("쿠폰 사용이 완료됐어요.");
+      router.refresh();
+    } catch (error) {
+      notify(error instanceof Error ? error.message : "쿠폰을 사용 처리하지 못했습니다.");
+    } finally {
+      setRedeeming(false);
     }
   };
 
@@ -265,7 +305,7 @@ export function StoreDetail({ store, section, member, membership, kakao }: Store
                       <p>{coupon.description ?? "매장에서 사용할 수 있는 멤버십 쿠폰"}</p>
                       <span>{formatDate(coupon.expiresAt)}까지</span>
                     </div>
-                    <button className="coupon-use" onClick={() => notify("직원에게 이 쿠폰 화면을 보여주세요.")}>사용</button>
+                    <button className="coupon-use" onClick={() => setRedeemingCoupon(coupon)}>사용</button>
                   </article>
                 ))}
               </div>
@@ -333,6 +373,31 @@ export function StoreDetail({ store, section, member, membership, kakao }: Store
           </>
         )}
       </div>
+
+      {redeemingCoupon && (
+        <div className="modal-backdrop coupon-confirm-backdrop" onClick={() => !redeeming && setRedeemingCoupon(null)}>
+          <section
+            className="coupon-confirm-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="coupon-confirm-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <span className="quick-icon coral" aria-hidden="true">
+              <span className="menu-icon ticket" />
+            </span>
+            <span className="detail-eyebrow">COUPON USE</span>
+            <h2 id="coupon-confirm-title">{redeemingCoupon.title}</h2>
+            <p>직원에게 이 화면을 보여드린 뒤 사용 완료를 눌러주세요. 처리 후에는 되돌릴 수 없어요.</p>
+            <button className="detail-primary" disabled={redeeming} onClick={redeemCoupon}>
+              {redeeming ? "사용 처리 중…" : "직원 확인 · 사용 완료"}
+            </button>
+            <button className="coupon-confirm-cancel" disabled={redeeming} onClick={() => setRedeemingCoupon(null)}>
+              취소
+            </button>
+          </section>
+        </div>
+      )}
 
       {toast && <div className="toast" role="status">{toast}</div>}
     </main>

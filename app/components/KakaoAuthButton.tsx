@@ -1,12 +1,12 @@
 "use client";
 
 import Script from "next/script";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
-const KAKAO_SDK_URL = "https://t1.kakaocdn.net/kakao_js_sdk/2.8.2/kakao.min.js";
-const KAKAO_SDK_INTEGRITY = "sha384-zt/G7/KfaRQ9dT/QIkS0ujMtzouJqzuSJcXVQu50x0rl/+mD1dc70AeOejVbMD9E";
+export const KAKAO_SDK_URL = "https://t1.kakaocdn.net/kakao_js_sdk/2.8.2/kakao.min.js";
+export const KAKAO_SDK_INTEGRITY = "sha384-zt/G7/KfaRQ9dT/QIkS0ujMtzouJqzuSJcXVQu50x0rl/+mD1dc70AeOejVbMD9E";
 
-type KakaoSdk = {
+export type KakaoSdk = {
   init: (javascriptKey: string) => void;
   isInitialized: () => boolean;
   Auth: {
@@ -14,8 +14,11 @@ type KakaoSdk = {
       redirectUri: string;
       state: string;
       channelPublicId?: string;
-      prompt?: "none";
+      scope?: string;
     }) => void;
+  };
+  Channel: {
+    addChannel: (options: { channelPublicId: string }) => void;
   };
 };
 
@@ -32,13 +35,11 @@ type KakaoAuthButtonProps = {
   returnTo: string;
   label?: string;
   className?: string;
-  autoLogin?: boolean;
-  autoLoginKey?: string;
-  hidden?: boolean;
+  scope?: string;
   onError?: (message: string) => void;
 };
 
-function initializeKakao(javascriptKey: string) {
+export function initializeKakao(javascriptKey: string) {
   if (!window.Kakao || !javascriptKey) return false;
   if (!window.Kakao.isInitialized()) window.Kakao.init(javascriptKey);
   return window.Kakao.isInitialized();
@@ -51,15 +52,13 @@ export function KakaoAuthButton({
   returnTo,
   label = "카카오로 1초 로그인",
   className = "kakao-login-button",
-  autoLogin = false,
-  autoLoginKey = "guest",
-  hidden = false,
+  scope,
   onError,
 }: KakaoAuthButtonProps) {
   const [ready, setReady] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const startLogin = useCallback(async (silent = false) => {
+  const startLogin = useCallback(async () => {
     if (!initializeKakao(javascriptKey) || !window.Kakao) {
       onError?.("카카오 로그인을 불러오는 중이에요. 잠시 후 다시 눌러주세요.");
       return;
@@ -83,26 +82,13 @@ export function KakaoAuthButton({
         redirectUri: `${window.location.origin}/api/auth/kakao/callback`,
         state: result.state,
         ...(channelPublicId ? { channelPublicId } : {}),
-        ...(silent ? { prompt: "none" as const } : {}),
+        ...(scope ? { scope } : {}),
       });
     } catch (error) {
       setLoading(false);
       onError?.(error instanceof Error ? error.message : "카카오 로그인을 시작하지 못했어요.");
     }
-  }, [channelPublicId, javascriptKey, onError, returnTo, storeCode]);
-
-  useEffect(() => {
-    if (!autoLogin || !ready) return;
-    if (!/KAKAOTALK/i.test(window.navigator.userAgent)) return;
-    if (new URLSearchParams(window.location.search).has("auth")) return;
-
-    const guardKey = `kakaoSilentLogin:${storeCode}:${autoLoginKey}`;
-    if (window.sessionStorage.getItem(guardKey) === "1") return;
-
-    window.sessionStorage.setItem(guardKey, "1");
-    const timer = window.setTimeout(() => void startLogin(true), 0);
-    return () => window.clearTimeout(timer);
-  }, [autoLogin, autoLoginKey, ready, startLogin, storeCode]);
+  }, [channelPublicId, javascriptKey, onError, returnTo, scope, storeCode]);
 
   return (
     <>
@@ -114,17 +100,15 @@ export function KakaoAuthButton({
         onReady={() => setReady(initializeKakao(javascriptKey))}
         onError={() => onError?.("카카오 로그인 모듈을 불러오지 못했어요.")}
       />
-      {!hidden && (
-        <button
-          type="button"
-          className={className}
-          disabled={!javascriptKey || loading}
-          onClick={() => void startLogin(false)}
-        >
-          <span aria-hidden="true">K</span>
-          {loading ? "카카오톡 여는 중…" : label}
-        </button>
-      )}
+      <button
+        type="button"
+        className={className}
+        disabled={!javascriptKey || !ready || loading}
+        onClick={() => void startLogin()}
+      >
+        <span aria-hidden="true">K</span>
+        {loading ? "카카오톡 여는 중…" : label}
+      </button>
     </>
   );
 }

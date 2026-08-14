@@ -3470,6 +3470,206 @@ button {
   border-right: 10px solid transparent;
 }
 
+/* Membership flow completion */
+.member-channel-status,
+.member-channel-row {
+  grid-column: 1 / -1;
+  margin-top: 2px;
+  border-radius: 16px;
+}
+
+.member-channel-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 13px;
+  color: #08746a;
+  background: #e4f6f1;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.member-channel-status > span {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-content: center;
+  color: white;
+  border-radius: 50%;
+  background: #119c8e;
+}
+
+.member-channel-row {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  background: #fff8d4;
+}
+
+.member-channel-row > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.member-channel-row > div:first-child strong {
+  margin: 0;
+  color: #302900;
+  font-size: 13px;
+  letter-spacing: -.02em;
+}
+
+.member-channel-row > div:first-child span {
+  color: #786d2a;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.member-channel-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.member-channel-add,
+.member-channel-sync {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 10px;
+  border-radius: 11px;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.member-channel-add {
+  color: #191919;
+  background: #fee500;
+}
+
+.member-channel-sync {
+  color: #413900;
+  border: 1px solid rgba(65,57,0,.14);
+  background: rgba(255,255,255,.72);
+}
+
+.member-channel-add > span,
+.member-channel-sync > span {
+  width: 21px;
+  height: 21px;
+  display: grid;
+  place-content: center;
+  flex: 0 0 auto;
+  color: #fee500;
+  border-radius: 50%;
+  background: #191919;
+  font-size: 10px;
+}
+
+.member-channel-add:disabled,
+.member-channel-sync:disabled {
+  opacity: .62;
+}
+
+.game-login-gate {
+  position: absolute;
+  z-index: 70;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+  text-align: center;
+  background: linear-gradient(180deg, rgba(4,35,51,.68), rgba(4,35,51,.86));
+  backdrop-filter: blur(8px);
+}
+
+.game-login-gate h2 {
+  margin: 18px 0 8px;
+  color: white;
+  font-size: clamp(27px, 7vw, 38px);
+  font-weight: 950;
+  letter-spacing: -.055em;
+}
+
+.game-login-gate > p {
+  max-width: 340px;
+  margin: 0 0 24px;
+  color: rgba(255,255,255,.8);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.game-login-gate .kakao-login-button,
+.game-login-home {
+  width: min(100%, 360px);
+}
+
+.game-login-home {
+  min-height: 48px;
+  margin-top: 8px;
+  color: white;
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 14px;
+  background: rgba(255,255,255,.08);
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.coupon-confirm-backdrop {
+  z-index: 95;
+}
+
+.coupon-confirm-modal {
+  width: min(430px, calc(100% - 28px));
+  padding: 28px 22px 20px;
+  border-radius: 28px;
+  text-align: center;
+  background: white;
+  box-shadow: 0 24px 70px rgba(2,34,49,.28);
+}
+
+.coupon-confirm-modal > .quick-icon {
+  margin: 0 auto 16px;
+}
+
+.coupon-confirm-modal h2 {
+  margin: 7px 0 9px;
+  color: var(--ink);
+  font-size: 25px;
+  font-weight: 950;
+  letter-spacing: -.045em;
+}
+
+.coupon-confirm-modal > p {
+  margin: 0 0 22px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.coupon-confirm-cancel {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 7px;
+  color: var(--ink);
+  border-radius: 14px;
+  background: #edf2f0;
+  font-size: 14px;
+  font-weight: 850;
+}
+
+@media (max-width: 380px) {
+  .member-channel-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
 .auth-close {
   position: absolute;
   top: 12px;

@@ -55,5 +55,6 @@ test("server-renders the fishing game route", async () => {
   const html = await response.text();
   assert.match(html, /행운의 대어잡기/);
   assert.match(html, /낚싯줄 던지기/);
-  assert.match(html, /무료 도전/);
+  assert.match(html, /오늘 1회/);
+  assert.match(html, /카카오 로그인 후 참여해요/);
 });

@@ -3,7 +3,10 @@
 import type { CSSProperties } from "react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import type { MemberView, PublicKakaoConfig } from "../../lib/auth/types";
+import type { TodayGamePlayView } from "../../lib/membership";
 import type { StoreConfig } from "../../lib/stores";
+import { KakaoAuthButton } from "./KakaoAuthButton";
 
 type GamePhase = "ready" | "casting" | "timing" | "catching" | "miss" | "result";
 
@@ -37,13 +40,19 @@ function rewardTone(reward: Omit<GameReward, "tone">) {
 
 type FishingGameProps = {
   store: StoreConfig;
+  member: MemberView | null;
+  initialReward: TodayGamePlayView | null;
+  kakao: PublicKakaoConfig;
 };
 
-export function FishingGame({ store }: FishingGameProps) {
+export function FishingGame({ store, member, initialReward, kakao }: FishingGameProps) {
   const router = useRouter();
-  const [phase, setPhase] = useState<GamePhase>("ready");
+  const alreadyPlayedToday = Boolean(initialReward);
+  const [phase, setPhase] = useState<GamePhase>(initialReward ? "result" : "ready");
   const [gauge, setGauge] = useState(0);
-  const [reward, setReward] = useState<GameReward | null>(null);
+  const [reward, setReward] = useState<GameReward | null>(() => initialReward
+    ? { ...initialReward, tone: rewardTone(initialReward) }
+    : null);
   const [gameError, setGameError] = useState("");
 
   const theme = {
@@ -99,6 +108,8 @@ export function FishingGame({ store }: FishingGameProps) {
   };
 
   const handleStageTap = async () => {
+    if (!member || alreadyPlayedToday) return;
+
     if (phase === "ready") {
       setReward(null);
       setGameError("");
@@ -140,7 +151,10 @@ export function FishingGame({ store }: FishingGameProps) {
     miss: gameError
       ? { title: "보상을 확인하지 못했어요", description: gameError }
       : { title: "앗, 살짝 빨랐어요", description: "초록 구간이 넓으니 천천히 다시 해보세요." },
-    result: { title: reward?.golden ? "대박! 황금 물고기!" : "낚시 성공!", description: "오늘의 행운 보상을 확인해보세요." },
+    result: {
+      title: alreadyPlayedToday ? "오늘 참여 완료" : reward?.golden ? "대박! 황금 물고기!" : "낚시 성공!",
+      description: alreadyPlayedToday ? "내일 다시 새로운 행운을 낚아보세요." : "오늘의 행운 보상을 확인해보세요.",
+    },
   };
 
   return (
@@ -149,7 +163,7 @@ export function FishingGame({ store }: FishingGameProps) {
         <header className="fishing-header">
           <button onClick={() => router.push(`/s/${store.publicCode}`)} aria-label="홈으로 돌아가기">←</button>
           <div><strong>행운의 대어잡기</strong><span>{store.displayName} {store.branchName}</span></div>
-          <span className="game-attempt">무료 도전</span>
+          <span className="game-attempt">{alreadyPlayedToday ? "참여 완료" : "오늘 1회"}</span>
         </header>
 
         <div className="fishing-copy" aria-live="polite">
@@ -198,7 +212,7 @@ export function FishingGame({ store }: FishingGameProps) {
         <button
           className="game-tap-surface"
           onClick={handleStageTap}
-          disabled={phase === "casting" || phase === "catching" || phase === "result" || phase === "miss"}
+          disabled={!member || phase === "casting" || phase === "catching" || phase === "result" || phase === "miss"}
           aria-label={phase === "ready" ? "낚싯줄 던지기" : phase === "timing" ? "물고기 낚아 올리기" : undefined}
         >
           <span className="stage-action">
@@ -239,6 +253,23 @@ export function FishingGame({ store }: FishingGameProps) {
               {reward.rewardType === "coupon" ? "내 쿠폰함 확인" : "적립 포인트 확인"}
             </button>
             <button className="game-retry" onClick={() => router.push(`/s/${store.publicCode}`)}>홈으로 돌아가기</button>
+          </section>
+        )}
+
+        {!member && (
+          <section className="game-login-gate" role="dialog" aria-modal="true" aria-labelledby="game-login-title">
+            <span className="auth-bubble" aria-hidden="true">K</span>
+            <h2 id="game-login-title">카카오 로그인 후 참여해요</h2>
+            <p>가입 즉시 500P를 받고, 오늘의 낚시 보상도 내 쿠폰함에 바로 저장돼요.</p>
+            <KakaoAuthButton
+              javascriptKey={kakao.javascriptKey}
+              channelPublicId={kakao.channelPublicId}
+              storeCode={store.publicCode}
+              returnTo={`/s/${store.publicCode}/game`}
+            />
+            <button className="game-login-home" onClick={() => router.push(`/s/${store.publicCode}`)}>
+              홈으로 돌아가기
+            </button>
           </section>
         )}
       </section>

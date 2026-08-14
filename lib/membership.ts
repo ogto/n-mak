@@ -1,6 +1,13 @@
 import { and, desc, eq } from "drizzle-orm";
 import { getDb } from "../db";
-import { checkins, memberCoupons, pointTransactions, storeMemberships } from "../db/schema";
+import {
+  checkins,
+  gamePlays,
+  gameRewardRules,
+  memberCoupons,
+  pointTransactions,
+  storeMemberships,
+} from "../db/schema";
 
 export type MembershipCouponView = {
   id: string;
@@ -28,6 +35,15 @@ export type MembershipDetailView = {
   checkinDates: string[];
   coupons: MembershipCouponView[];
   pointTransactions: PointTransactionView[];
+};
+
+export type TodayGamePlayView = {
+  id: string;
+  name: string;
+  description: string;
+  rewardType: "coupon" | "points";
+  rewardValue: number | null;
+  golden: boolean;
 };
 
 function seoulDateKey(date = new Date()) {
@@ -120,5 +136,42 @@ export async function getMembershipDetails(
       ...transaction,
       createdAt: transaction.createdAt.toISOString(),
     })),
+  };
+}
+
+export async function getTodayGamePlay(
+  storeId: string,
+  memberId: string,
+): Promise<TodayGamePlayView | null> {
+  const [play] = await getDb()
+    .select({
+      id: gamePlays.id,
+      name: gamePlays.rewardNameSnapshot,
+      description: gameRewardRules.description,
+      rewardType: gameRewardRules.rewardType,
+      rewardValue: gameRewardRules.rewardValue,
+      golden: gamePlays.golden,
+    })
+    .from(gamePlays)
+    .innerJoin(storeMemberships, eq(gamePlays.membershipId, storeMemberships.id))
+    .leftJoin(gameRewardRules, eq(gamePlays.rewardRuleId, gameRewardRules.id))
+    .where(
+      and(
+        eq(gamePlays.storeId, storeId),
+        eq(storeMemberships.memberId, memberId),
+        eq(gamePlays.playDate, seoulDateKey()),
+      ),
+    )
+    .limit(1);
+
+  if (!play) return null;
+
+  return {
+    id: play.id,
+    name: play.name,
+    description: play.description ?? "오늘의 게임 보상",
+    rewardType: play.rewardType === "points" ? "points" : "coupon",
+    rewardValue: play.rewardValue,
+    golden: play.golden,
   };
 }

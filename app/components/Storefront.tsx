@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import type { MemberView, PublicKakaoConfig } from "../../lib/auth/types";
 import type { StoreConfig } from "../../lib/stores";
 import { KakaoAuthButton } from "./KakaoAuthButton";
+import { KakaoChannelButton } from "./KakaoChannelButton";
 
 const quickMenus = [
   { icon: "attendance", label: "출석체크", tone: "mint", section: "attendance" },
@@ -33,14 +34,16 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
   const returnTo = `/s/${store.publicCode}`;
 
   useEffect(() => {
-    if (store.internalKey !== "a-fish-brothers") return;
+    if (!member || store.internalKey !== "a-fish-brothers") return;
 
     const storageKey = `promoSeen:${store.publicCode}:cold-noodle`;
-    if (window.sessionStorage.getItem(storageKey) === "1") return;
+    const seenAt = Number(window.localStorage.getItem(storageKey) ?? 0);
+    const sevenDays = 7 * 24 * 60 * 60 * 1000;
+    if (seenAt > 0 && Date.now() - seenAt < sevenDays) return;
 
-    const timer = window.setTimeout(() => setPromoOpen(true), 0);
+    const timer = window.setTimeout(() => setPromoOpen(true), 550);
     return () => window.clearTimeout(timer);
-  }, [store.internalKey, store.publicCode]);
+  }, [member, store.internalKey, store.publicCode]);
 
   useEffect(() => {
     const url = new URL(window.location.href);
@@ -75,7 +78,7 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
   };
 
   const closePromo = () => {
-    window.sessionStorage.setItem(`promoSeen:${store.publicCode}:cold-noodle`, "1");
+    window.localStorage.setItem(`promoSeen:${store.publicCode}:cold-noodle`, String(Date.now()));
     setPromoOpen(false);
   };
 
@@ -96,19 +99,6 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
 
   return (
     <main className="app-shell" style={theme} data-store-code={store.publicCode}>
-      {(!member || !member.nickname) && (
-        <KakaoAuthButton
-          javascriptKey={kakao.javascriptKey}
-          channelPublicId={kakao.channelPublicId}
-          storeCode={store.publicCode}
-          returnTo={returnTo}
-          autoLogin
-          autoLoginKey={member ? "profile-refresh" : "guest"}
-          hidden
-          onError={notify}
-        />
-      )}
-
       <section className="hero" id="home">
         <div className="hero-glow" aria-hidden="true" />
         <header className="topbar">
@@ -174,15 +164,16 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
           <div className="member-card">
             <div>
               <span className="member-tier">{tierLabel(member.tier)}</span>
-              <strong>{member.nickname ? `${member.nickname}님, 반가워요!` : "카카오 회원님, 반가워요!"}</strong>
+              <strong>{member.nickname ? `${member.nickname}님, 반가워요!` : "회원님, 반가워요!"}</strong>
               {!member.nickname && (
                 <KakaoAuthButton
                   javascriptKey={kakao.javascriptKey}
                   channelPublicId={kakao.channelPublicId}
                   storeCode={store.publicCode}
                   returnTo={returnTo}
-                  label="카카오 이름 불러오기"
+                  label="카카오 정보 새로고침"
                   className="member-name-button"
+                  scope="name,profile_nickname,plusfriends"
                   onError={notify}
                 />
               )}
@@ -195,6 +186,41 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
               <span style={{ width: `${Math.min(100, member.lifetimePoints / 40)}%` }} />
             </div>
             <p>방문 {member.visitCount}회 · 적립 포인트는 매장에서 바로 사용할 수 있어요.</p>
+            {member.channelFriendStatus === "added" ? (
+              <div className="member-channel-status added">
+                <span aria-hidden="true">✓</span>
+                카카오톡 채널 연결됨
+              </div>
+            ) : (
+              <div className="member-channel-row">
+                <div>
+                  <strong>
+                    {member.channelFriendStatus === "blocked"
+                      ? "채널 수신이 차단되어 있어요"
+                      : "채널 친구 추가를 완료해주세요"}
+                  </strong>
+                  <span>신메뉴와 쿠폰 소식을 카카오톡으로 받아보세요.</span>
+                </div>
+                <div className="member-channel-actions">
+                  <KakaoChannelButton
+                    javascriptKey={kakao.javascriptKey}
+                    channelPublicId={kakao.channelPublicId}
+                    onReturn={() => router.refresh()}
+                    onError={notify}
+                  />
+                  <KakaoAuthButton
+                    javascriptKey={kakao.javascriptKey}
+                    channelPublicId={kakao.channelPublicId}
+                    storeCode={store.publicCode}
+                    returnTo={returnTo}
+                    label="추가 후 상태 확인"
+                    className="member-channel-sync"
+                    scope="plusfriends"
+                    onError={notify}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div className="member-card member-card-guest">

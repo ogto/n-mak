@@ -80,7 +80,12 @@ export async function getKakaoChannelFriendStatus(accessToken: string, channelPu
       cache: "no-store",
     });
 
-    if (!response.ok) return "unknown" as const;
+    if (!response.ok) {
+      console.warn("Kakao channel relationship lookup was unavailable.", {
+        status: response.status,
+      });
+      return "unknown" as const;
+    }
 
     const result = (await response.json()) as KakaoChannelResponse;
     const relation = result.channels?.find(
@@ -91,7 +96,10 @@ export async function getKakaoChannelFriendStatus(accessToken: string, channelPu
     if (relation === "BLOCKED") return "blocked" as const;
     if (relation === "NONE") return "not_added" as const;
     return "unknown" as const;
-  } catch {
+  } catch (error) {
+    console.warn("Kakao channel relationship lookup failed.", {
+      message: error instanceof Error ? error.message : "unknown error",
+    });
     return "unknown" as const;
   }
 }
@@ -115,6 +123,16 @@ export async function upsertKakaoMember(input: {
   const account = input.user.kakao_account;
   const profile = account?.profile;
   const displayName = account?.name ?? account?.legal_name ?? profile?.nickname ?? null;
+  const updateValues = {
+    lastLoginAt: now,
+    deletedAt: null,
+    updatedAt: now,
+    ...(displayName ? { nickname: displayName } : {}),
+    ...(profile?.profile_image_url ? { profileImageUrl: profile.profile_image_url } : {}),
+    ...(input.channelFriendStatus !== "unknown"
+      ? { channelFriendStatus: input.channelFriendStatus }
+      : {}),
+  };
   const [member] = await db
     .insert(members)
     .values({
@@ -127,14 +145,7 @@ export async function upsertKakaoMember(input: {
     })
     .onConflictDoUpdate({
       target: members.kakaoUserId,
-      set: {
-        nickname: displayName,
-        profileImageUrl: profile?.profile_image_url ?? null,
-        channelFriendStatus: input.channelFriendStatus,
-        lastLoginAt: now,
-        deletedAt: null,
-        updatedAt: now,
-      },
+      set: updateValues,
     })
     .returning({ id: members.id, kakaoUserId: members.kakaoUserId });
 
