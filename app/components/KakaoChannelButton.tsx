@@ -1,7 +1,7 @@
 "use client";
 
 import Script from "next/script";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   initializeKakao,
   KAKAO_SDK_INTEGRITY,
@@ -11,7 +11,7 @@ import {
 type KakaoChannelButtonProps = {
   javascriptKey: string;
   channelPublicId: string;
-  onReturn: () => void;
+  onReturn: () => void | Promise<void>;
   onError?: (message: string) => void;
 };
 
@@ -23,14 +23,16 @@ export function KakaoChannelButton({
 }: KakaoChannelButtonProps) {
   const [ready, setReady] = useState(false);
   const [waitingForReturn, setWaitingForReturn] = useState(false);
+  const returnHandledRef = useRef(false);
 
   useEffect(() => {
     if (!waitingForReturn) return;
 
     const refreshAfterReturn = () => {
-      if (document.visibilityState !== "visible") return;
-      window.setTimeout(onReturn, 700);
+      if (document.visibilityState !== "visible" || returnHandledRef.current) return;
+      returnHandledRef.current = true;
       setWaitingForReturn(false);
+      window.setTimeout(() => void onReturn(), 900);
     };
 
     document.addEventListener("visibilitychange", refreshAfterReturn);
@@ -47,6 +49,7 @@ export function KakaoChannelButton({
       return;
     }
 
+    returnHandledRef.current = false;
     setWaitingForReturn(true);
     window.Kakao.Channel.addChannel({ channelPublicId });
   };
@@ -64,11 +67,11 @@ export function KakaoChannelButton({
       <button
         type="button"
         className="member-channel-add"
-        disabled={!javascriptKey || !channelPublicId || !ready}
+        disabled={!javascriptKey || !channelPublicId || !ready || waitingForReturn}
+        aria-busy={waitingForReturn}
         onClick={addChannel}
       >
-        <span aria-hidden="true">K</span>
-        채널 친구 추가
+        {waitingForReturn ? "카카오톡에서 추가해 주세요" : "친구 추가하기"}
       </button>
     </>
   );

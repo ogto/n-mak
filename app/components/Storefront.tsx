@@ -3,10 +3,11 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type { CSSProperties } from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { MemberView, PublicKakaoConfig } from "../../lib/auth/types";
 import type { StoreConfig } from "../../lib/stores";
 import { KakaoAuthButton } from "./KakaoAuthButton";
+import { KakaoChannelButton } from "./KakaoChannelButton";
 
 const quickMenus = [
   { icon: "attendance", label: "출석체크", tone: "mint", section: "attendance" },
@@ -18,15 +19,54 @@ const quickMenus = [
 type StorefrontProps = {
   store: StoreConfig;
   member: MemberView | null;
+  hasPendingKakaoSignup: boolean;
   kakao: PublicKakaoConfig;
 };
 
-export function Storefront({ store, member, kakao }: StorefrontProps) {
+type AuthStage = "login" | "channel" | "retry";
+
+type ChannelVerifyResponse = {
+  ok?: boolean;
+  status?: string;
+  returnTo?: string;
+};
+
+function safeStoreReturnTo(value: string | null | undefined, storeCode: string) {
+  const fallback = `/s/${storeCode}`;
+  if (!value?.startsWith(fallback) || value.startsWith("//")) return fallback;
+
+  try {
+    const url = new URL(value, "https://n-mak.invalid");
+    if (url.origin !== "https://n-mak.invalid") return fallback;
+    if (url.pathname !== fallback && !url.pathname.startsWith(`${fallback}/`)) return fallback;
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return fallback;
+  }
+}
+
+export function Storefront({
+  store,
+  member,
+  hasPendingKakaoSignup,
+  kakao,
+}: StorefrontProps) {
   const router = useRouter();
-  const [promoOpen, setPromoOpen] = useState(false);
-  const [loginOpen, setLoginOpen] = useState(false);
-  const [toast, setToast] = useState("");
   const returnTo = `/s/${store.publicCode}`;
+  const initiallyPending = hasPendingKakaoSignup && !member;
+  const [promoOpen, setPromoOpen] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(initiallyPending);
+  const [authStage, setAuthStage] = useState<AuthStage>(initiallyPending ? "channel" : "login");
+  const [authMessage, setAuthMessage] = useState("");
+  const [channelChecking, setChannelChecking] = useState(false);
+  const [pendingChannel, setPendingChannel] = useState(initiallyPending);
+  const [loginReturnTo, setLoginReturnTo] = useState(returnTo);
+  const [toast, setToast] = useState("");
+
+  const notify = useCallback((message: string, duration = 2200) => {
+    setToast(message);
+    window.setTimeout(() => setToast(""), duration);
+  }, []);
 
   useEffect(() => {
     if (!member || store.internalKey !== "a-fish-brothers") return;
@@ -45,25 +85,58 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
     const status = url.searchParams.get("auth");
     if (!status) return;
 
+    const nextReturnTo = safeStoreReturnTo(
+      url.searchParams.get("next"),
+      store.publicCode,
+    );
+
     const messages: Record<string, string> = {
       success: "카카오 로그인이 완료됐어요.",
-      consent_required: "아래 버튼을 눌러 카카오 로그인을 완료해 주세요.",
-      channel_required: "카카오톡 채널을 추가하면 500P를 받을 수 있어요.",
-      channel_check_failed: "채널 친구 확인이 지연되고 있어요. 잠시 후 다시 시도해 주세요.",
-      failed: "로그인에 실패했어요. 다시 시도해 주세요.",
-      invalid_state: "로그인에 실패했어요. 다시 시도해 주세요.",
       cancelled: "카카오 로그인이 취소됐어요.",
     };
     const message = messages[status] ?? "";
-    const showTimer = message ? window.setTimeout(() => setToast(message), 0) : undefined;
-    const hideTimer = message ? window.setTimeout(() => setToast(""), 2200) : undefined;
+    let hideTimer: number | undefined;
+    const applyStatusTimer = window.setTimeout(() => {
+      setLoginReturnTo(nextReturnTo);
+      if (message) {
+        setToast(message);
+        hideTimer = window.setTimeout(() => setToast(""), 2200);
+      }
+
+      if (status === "channel_required" || status === "channel_check_failed") {
+        setPendingChannel(true);
+        setAuthStage("channel");
+        setAuthMessage(
+          status === "channel_check_failed"
+            ? "친구 추가 후 아래 버튼을 눌러 500P를 받아보세요."
+            : "",
+        );
+        setLoginOpen(true);
+      } else if (status === "rate_limited") {
+        setPendingChannel(false);
+        setAuthStage("retry");
+        setAuthMessage("잠시 후 다시 시작하면 바로 이어갈 수 있어요.");
+        setLoginOpen(true);
+      } else if (status === "failed" || status === "invalid_state") {
+        setPendingChannel(false);
+        setAuthStage("retry");
+        setAuthMessage("한 번 더 눌러 가입을 이어가 주세요.");
+        setLoginOpen(true);
+      } else if (status === "consent_required") {
+        setAuthStage("login");
+        setAuthMessage("");
+        setLoginOpen(true);
+      }
+    }, 0);
+
     url.searchParams.delete("auth");
+    url.searchParams.delete("next");
     window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
     return () => {
-      if (showTimer) window.clearTimeout(showTimer);
+      window.clearTimeout(applyStatusTimer);
       if (hideTimer) window.clearTimeout(hideTimer);
     };
-  }, []);
+  }, [store.publicCode]);
 
   const theme = {
     "--navy": store.theme.navy,
@@ -74,15 +147,61 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
     "--cream": store.theme.cream,
   } as CSSProperties;
 
-  const notify = (message: string, duration = 2200) => {
-    setToast(message);
-    window.setTimeout(() => setToast(""), duration);
-  };
-
   const closePromo = () => {
     window.localStorage.setItem(`promoSeen:${store.publicCode}:shrimp-salt-grill`, String(Date.now()));
     setPromoOpen(false);
   };
+
+  const openLogin = (destination = returnTo) => {
+    setLoginReturnTo(safeStoreReturnTo(destination, store.publicCode));
+    setAuthMessage("");
+    setAuthStage(pendingChannel ? "channel" : "login");
+    setLoginOpen(true);
+  };
+
+  const verifyChannel = useCallback(async () => {
+    if (channelChecking) return;
+
+    setChannelChecking(true);
+    setAuthMessage("");
+
+    try {
+      const response = await fetch("/api/auth/kakao/channel/verify", {
+        method: "POST",
+        credentials: "same-origin",
+        cache: "no-store",
+      });
+      const result = await response.json() as ChannelVerifyResponse;
+
+      if (response.ok && result.ok) {
+        setPendingChannel(false);
+        setLoginOpen(false);
+        notify("500P가 지급됐어요!", 2600);
+        window.location.assign(
+          safeStoreReturnTo(result.returnTo ?? loginReturnTo, store.publicCode),
+        );
+        return;
+      }
+
+      if (result.status === "channel_required") {
+        setAuthMessage("친구 추가를 완료한 뒤 다시 확인해 주세요.");
+        return;
+      }
+
+      if (result.status === "expired") {
+        setPendingChannel(false);
+        setAuthStage("retry");
+        setAuthMessage("가입을 다시 시작하면 500P를 바로 받을 수 있어요.");
+        return;
+      }
+
+      setAuthMessage("잠시 후 다시 확인해 주세요.");
+    } catch {
+      setAuthMessage("연결이 잠시 불안정해요. 다시 확인해 주세요.");
+    } finally {
+      setChannelChecking(false);
+    }
+  }, [channelChecking, loginReturnTo, notify, store.publicCode]);
 
   const quickDetail = (section: (typeof quickMenus)[number]["section"]) => {
     if (section === "attendance") return member ? `방문 ${member.visitCount}회` : "오늘 +100P";
@@ -93,7 +212,7 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
 
   const goToQuickMenu = (section: (typeof quickMenus)[number]["section"]) => {
     if (section !== "store" && !member) {
-      setLoginOpen(true);
+      openLogin(`/s/${store.publicCode}/${section}`);
       return;
     }
     router.push(`/s/${store.publicCode}/${section}`);
@@ -138,7 +257,9 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
 
           <button
             className="game-card"
-            onClick={() => member ? router.push(`/s/${store.publicCode}/game`) : setLoginOpen(true)}
+            onClick={() => member
+              ? router.push(`/s/${store.publicCode}/game`)
+              : openLogin(`/s/${store.publicCode}/game`)}
           >
             {store.game.artSrc ? (
               <Image
@@ -202,13 +323,23 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
               <strong>지금 카톡 친구 추가하고 500P 받자!</strong>
               <p>가입 혜택 챙기고 행운의 대어까지 낚아보세요.</p>
             </div>
-            <KakaoAuthButton
-              javascriptKey={kakao.javascriptKey}
-              channelPublicId={kakao.channelPublicId}
-              storeCode={store.publicCode}
-              returnTo={returnTo}
-              onError={notify}
-            />
+            {pendingChannel ? (
+              <button
+                type="button"
+                className="member-channel-add member-signup-resume"
+                onClick={() => openLogin(loginReturnTo)}
+              >
+                500P 받기
+              </button>
+            ) : (
+              <KakaoAuthButton
+                javascriptKey={kakao.javascriptKey}
+                channelPublicId={kakao.channelPublicId}
+                storeCode={store.publicCode}
+                returnTo={returnTo}
+                onError={notify}
+              />
+            )}
           </div>
         )}
 
@@ -257,14 +388,43 @@ export function Storefront({ store, member, kakao }: StorefrontProps) {
             onClick={(event) => event.stopPropagation()}
           >
             <button className="auth-close" onClick={() => setLoginOpen(false)} aria-label="닫기">×</button>
-            <h2 id="auth-title">500P 받고 대어 잡으러 가요!</h2>
-            <KakaoAuthButton
-              javascriptKey={kakao.javascriptKey}
-              channelPublicId={kakao.channelPublicId}
-              storeCode={store.publicCode}
-              returnTo={returnTo}
-              onError={notify}
-            />
+            {authStage === "channel" ? (
+              <>
+                <h2 id="auth-title">친구 추가하고 500P 받기</h2>
+                <p>친구 추가가 완료되면 포인트와 낚시 게임이 바로 열려요.</p>
+                <div className="auth-channel-actions">
+                  <KakaoChannelButton
+                    javascriptKey={kakao.javascriptKey}
+                    channelPublicId={kakao.channelPublicId}
+                    onReturn={verifyChannel}
+                    onError={notify}
+                  />
+                  <button
+                    type="button"
+                    className="member-channel-sync auth-channel-verify"
+                    disabled={channelChecking}
+                    aria-busy={channelChecking}
+                    onClick={() => void verifyChannel()}
+                  >
+                    {channelChecking ? "확인 중..." : "추가 완료했어요"}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <h2 id="auth-title">
+                  {authStage === "retry" ? "500P 받으러 다시 시작해요" : "500P 받고 대어 잡으러 가요!"}
+                </h2>
+                <KakaoAuthButton
+                  javascriptKey={kakao.javascriptKey}
+                  channelPublicId={kakao.channelPublicId}
+                  storeCode={store.publicCode}
+                  returnTo={loginReturnTo}
+                  onError={notify}
+                />
+              </>
+            )}
+            {authMessage ? <p className="auth-message" role="status">{authMessage}</p> : null}
           </section>
         </div>
       )}

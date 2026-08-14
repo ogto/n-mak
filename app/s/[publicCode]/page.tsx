@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Storefront } from "../../components/Storefront";
 import { getStoreByPublicCode } from "../../../lib/stores";
-import { getCurrentMember } from "../../../lib/auth/current-member";
+import {
+  getCurrentMember,
+  hasPendingKakaoSignup,
+} from "../../../lib/auth/current-member";
 
 export const dynamic = "force-dynamic";
 
@@ -41,12 +44,16 @@ export default async function StorePage({ params }: StorePageProps) {
     notFound();
   }
 
-  const member = await getCurrentMember(store.id);
+  const [member, hasPendingKakao] = await Promise.all([
+    getCurrentMember(store.id),
+    hasPendingKakaoSignup(store.publicCode),
+  ]);
 
   return (
     <Storefront
       store={store}
       member={member}
+      hasPendingKakaoSignup={hasPendingKakao}
       kakao={{
         javascriptKey: process.env.NEXT_PUBLIC_KAKAO_JS_KEY ?? "",
         channelPublicId: process.env.KAKAO_CHANNEL_ID ?? store.kakaoChannelId,

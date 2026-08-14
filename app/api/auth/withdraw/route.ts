@@ -3,7 +3,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { members } from "../../../../db/schema";
 import { getDb } from "../../../../db";
 import { unlinkKakaoUser } from "../../../../lib/auth/kakao";
-import { readSessionToken, SESSION_COOKIE_NAME } from "../../../../lib/auth/session";
+import {
+  PENDING_CHANNEL_COOKIE_NAME,
+  readSessionToken,
+  SESSION_COOKIE_NAME,
+} from "../../../../lib/auth/session";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +19,7 @@ function clearSession(response: NextResponse, request: NextRequest) {
     path: "/",
     maxAge: 0,
   });
+  response.cookies.delete(PENDING_CHANNEL_COOKIE_NAME);
   return response;
 }
 

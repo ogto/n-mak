@@ -3405,6 +3405,39 @@ button {
   line-height: 1.6;
 }
 
+.auth-channel-actions {
+  display: grid;
+  gap: 10px;
+}
+
+.auth-channel-actions .member-channel-add,
+.auth-channel-actions .member-channel-sync {
+  width: 100%;
+  min-height: 54px;
+  border-radius: 13px;
+  font-size: 15px;
+}
+
+.auth-channel-actions .member-channel-sync {
+  color: #162b36;
+  border-color: rgba(8, 38, 51, .13);
+  background: #edf2f1;
+}
+
+.auth-modal > .auth-message {
+  margin: 14px auto 0;
+  color: #49606b;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.member-signup-resume {
+  width: 100%;
+  min-height: 54px;
+  border-radius: 12px;
+  font-size: 15px;
+}
+
 /* Membership flow completion */
 .member-channel-status,
 .member-channel-row {

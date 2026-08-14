@@ -2,7 +2,12 @@ import { and, eq, isNull, sql } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { getDb } from "../../db";
 import { members, storeMemberships } from "../../db/schema";
-import { readSessionToken, SESSION_COOKIE_NAME } from "./session";
+import {
+  PENDING_CHANNEL_COOKIE_NAME,
+  readPendingChannelToken,
+  readSessionToken,
+  SESSION_COOKIE_NAME,
+} from "./session";
 import type { MemberView } from "./types";
 
 export async function getCurrentMember(storeId: string): Promise<MemberView | null> {
@@ -51,4 +56,13 @@ export async function getCurrentMember(storeId: string): Promise<MemberView | nu
     console.error("Failed to load the current membership.", error);
     return null;
   }
+}
+
+export async function hasPendingKakaoSignup(storeCode: string) {
+  const cookieStore = await cookies();
+  const pending = await readPendingChannelToken(
+    cookieStore.get(PENDING_CHANNEL_COOKIE_NAME)?.value,
+  );
+
+  return pending?.storeCode === storeCode;
 }

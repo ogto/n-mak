@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import { SESSION_COOKIE_NAME } from "../../../../lib/auth/session";
+import {
+  PENDING_CHANNEL_COOKIE_NAME,
+  SESSION_COOKIE_NAME,
+} from "../../../../lib/auth/session";
 
 export async function POST(request: Request) {
   const response = NextResponse.json({ ok: true });
@@ -10,5 +13,6 @@ export async function POST(request: Request) {
     path: "/",
     maxAge: 0,
   });
+  response.cookies.delete(PENDING_CHANNEL_COOKIE_NAME);
   return response;
 }

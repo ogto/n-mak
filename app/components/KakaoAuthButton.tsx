@@ -9,6 +9,7 @@ export const KAKAO_SDK_INTEGRITY = "sha384-zt/G7/KfaRQ9dT/QIkS0ujMtzouJqzuSJcXVQ
 export const KAKAO_MEMBERSHIP_SCOPE = "profile_nickname,plusfriends";
 const KAKAO_LOGIN_BUTTON_IMAGE =
   "https://developers.kakao.com/tool/resource/static/img/button/login/full/ko/kakao_login_large_wide.png";
+const KAKAO_LOGIN_COOLDOWN_MS = 8_000;
 
 export type KakaoSdk = {
   init: (javascriptKey: string) => void;
@@ -64,6 +65,13 @@ export function KakaoAuthButton({
       return;
     }
 
+    const cooldownKey = `kakao-login-started:${storeCode}`;
+    const lastStartedAt = Number(window.sessionStorage.getItem(cooldownKey) ?? 0);
+    if (lastStartedAt > 0 && Date.now() - lastStartedAt < KAKAO_LOGIN_COOLDOWN_MS) {
+      onError?.("잠시만 기다린 뒤 다시 눌러주세요.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -78,6 +86,7 @@ export function KakaoAuthButton({
         throw new Error(result.error ?? "로그인 준비에 실패했습니다.");
       }
 
+      window.sessionStorage.setItem(cooldownKey, String(Date.now()));
       window.Kakao.Auth.authorize({
         redirectUri: `${window.location.origin}/api/auth/kakao/callback`,
         state: result.state,
@@ -85,6 +94,7 @@ export function KakaoAuthButton({
         scope: scope ?? KAKAO_MEMBERSHIP_SCOPE,
       });
     } catch (error) {
+      window.sessionStorage.removeItem(cooldownKey);
       setLoading(false);
       onError?.(error instanceof Error ? error.message : "카카오 로그인을 시작하지 못했어요.");
     }

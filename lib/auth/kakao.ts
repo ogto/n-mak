@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { getDb, getSql } from "../../db";
 import { members, storeMemberships, stores } from "../../db/schema";
 
@@ -6,6 +6,7 @@ type KakaoTokenResponse = {
   access_token?: string;
   error?: string;
   error_description?: string;
+  error_code?: string;
 };
 
 type KakaoUserResponse = {
@@ -35,6 +36,41 @@ type KakaoUnlinkResponse = {
 
 export type KakaoChannelFriendStatus = "unknown" | "added" | "not_added" | "blocked";
 
+function parseKakaoChannelFriendStatus(
+  result: KakaoChannelResponse,
+  channelPublicId: string,
+): KakaoChannelFriendStatus {
+  const relation = result.channels?.find(
+    (channel) => channel.channel_public_id === channelPublicId,
+  )?.relation;
+
+  if (relation === "ADDED") return "added";
+  if (relation === "BLOCKED") return "blocked";
+  if (relation === "NONE") return "not_added";
+  return "unknown";
+}
+
+export class KakaoOAuthError extends Error {
+  constructor(
+    public readonly oauthError: string,
+    public readonly description: string,
+    public readonly responseStatus: number,
+  ) {
+    super(`Kakao token exchange failed: ${oauthError}`);
+    this.name = "KakaoOAuthError";
+  }
+}
+
+export function getSafeKakaoOAuthError(error: KakaoOAuthError) {
+  return {
+    oauthError: error.oauthError,
+    description: error.description
+      .replace(/code=[^\s&]+/giu, "code=[redacted]")
+      .slice(0, 240),
+    responseStatus: error.responseStatus,
+  };
+}
+
 export async function exchangeKakaoCode(code: string, redirectUri: string) {
   const restApiKey = process.env.KAKAO_REST_API_KEY;
   const clientSecret = process.env.KAKAO_CLIENT_SECRET;
@@ -59,7 +95,11 @@ export async function exchangeKakaoCode(code: string, redirectUri: string) {
   const result = (await response.json()) as KakaoTokenResponse;
 
   if (!response.ok || !result.access_token) {
-    throw new Error(`Kakao token exchange failed: ${result.error ?? response.status}`);
+    throw new KakaoOAuthError(
+      result.error ?? result.error_code ?? "unknown_error",
+      result.error_description ?? "",
+      response.status,
+    );
   }
 
   return result.access_token;
@@ -96,16 +136,46 @@ export async function getKakaoChannelFriendStatus(accessToken: string, channelPu
     }
 
     const result = (await response.json()) as KakaoChannelResponse;
-    const relation = result.channels?.find(
-      (channel) => channel.channel_public_id === channelPublicId,
-    )?.relation;
-
-    if (relation === "ADDED") return "added" as const;
-    if (relation === "BLOCKED") return "blocked" as const;
-    if (relation === "NONE") return "not_added" as const;
-    return "unknown" as const;
+    return parseKakaoChannelFriendStatus(result, channelPublicId);
   } catch (error) {
     console.warn("Kakao channel relationship lookup failed.", {
+      message: error instanceof Error ? error.message : "unknown error",
+    });
+    return "unknown" as const;
+  }
+}
+
+export async function getKakaoChannelFriendStatusByAdmin(
+  kakaoUserId: string,
+  channelPublicId: string,
+) {
+  const adminKey = process.env.KAKAO_ADMIN_KEY;
+  if (!adminKey || !kakaoUserId || !channelPublicId) return "unknown" as const;
+
+  try {
+    const url = new URL("https://kapi.kakao.com/v2/api/talk/channels");
+    url.searchParams.set("target_id_type", "user_id");
+    url.searchParams.set("target_id", kakaoUserId);
+    url.searchParams.set("channel_ids", channelPublicId);
+    url.searchParams.set("channel_id_type", "channel_public_id");
+    const response = await fetch(url, {
+      headers: { Authorization: `KakaoAK ${adminKey}` },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      console.warn("Kakao channel relationship admin lookup was unavailable.", {
+        status: response.status,
+      });
+      return "unknown" as const;
+    }
+
+    return parseKakaoChannelFriendStatus(
+      (await response.json()) as KakaoChannelResponse,
+      channelPublicId,
+    );
+  } catch (error) {
+    console.warn("Kakao channel relationship admin lookup failed.", {
       message: error instanceof Error ? error.message : "unknown error",
     });
     return "unknown" as const;
@@ -143,9 +213,6 @@ export async function upsertKakaoMember(input: {
   storeCode: string;
   channelFriendStatus: KakaoChannelFriendStatus;
 }) {
-  if (input.channelFriendStatus !== "added") {
-    throw new Error("Kakao channel friendship is required before creating a membership.");
-  }
   const db = getDb();
   const [store] = await db
     .select({ id: stores.id })
@@ -184,9 +251,6 @@ export async function upsertKakaoMember(input: {
     })
     .returning({ id: members.id, kakaoUserId: members.kakaoUserId });
 
-  const sql = getSql();
-  const signupIdempotencyKey = `signup:${store.id}:${member.id}`;
-
   await db
     .insert(storeMemberships)
     .values({ storeId: store.id, memberId: member.id })
@@ -194,11 +258,22 @@ export async function upsertKakaoMember(input: {
       target: [storeMemberships.storeId, storeMemberships.memberId],
     });
 
+  if (input.channelFriendStatus === "added") {
+    await awardSignupBonus(store.id, member.id);
+  }
+
+  return member;
+}
+
+async function awardSignupBonus(storeId: string, memberId: string) {
+  const sql = getSql();
+  const signupIdempotencyKey = `signup:${storeId}:${memberId}`;
+
   await sql`
     with membership as (
       select id, points_balance
       from store_memberships
-      where store_id = ${store.id} and member_id = ${member.id}
+      where store_id = ${storeId} and member_id = ${memberId}
       limit 1
     ), bonus as (
       insert into point_transactions (
@@ -218,7 +293,7 @@ export async function upsertKakaoMember(input: {
         points_balance + 500,
         '신규 가입 축하 포인트',
         'signup',
-        ${member.id},
+        ${memberId},
         ${signupIdempotencyKey}
       from membership
       on conflict (idempotency_key) do nothing
@@ -232,6 +307,42 @@ export async function upsertKakaoMember(input: {
     from bonus
     where sm.id = bonus.membership_id
   `;
+}
+
+export async function activateKakaoMembership(input: {
+  memberId: string;
+  kakaoUserId: string;
+  storeCode: string;
+}) {
+  const db = getDb();
+  const [store] = await db
+    .select({ id: stores.id })
+    .from(stores)
+    .where(eq(stores.publicCode, input.storeCode))
+    .limit(1);
+
+  if (!store) throw new Error("The requested store is not registered in the database.");
+
+  const [member] = await db
+    .update(members)
+    .set({
+      channelFriendStatus: "added",
+      deletedAt: null,
+      lastLoginAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(and(eq(members.id, input.memberId), eq(members.kakaoUserId, input.kakaoUserId)))
+    .returning({ id: members.id, kakaoUserId: members.kakaoUserId });
+
+  if (!member) throw new Error("The pending Kakao membership could not be found.");
+
+  await db
+    .insert(storeMemberships)
+    .values({ storeId: store.id, memberId: member.id })
+    .onConflictDoNothing({
+      target: [storeMemberships.storeId, storeMemberships.memberId],
+    });
+  await awardSignupBonus(store.id, member.id);
 
   return member;
 }
